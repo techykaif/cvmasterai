@@ -91,6 +91,16 @@ const SignIn = () => {
               <Link href="/forgot-password" className="text-blue-500 hover:underline">Forgot Password?</Link>
             </p>
           </div>
+
+          {/* Don't have an account? Create one */}
+          <div className="text-center w-full mt-4">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{" "}
+              <Link href="/signup" className="text-blue-500 hover:underline">
+                Create one
+              </Link>
+            </p>
+          </div>
         </form>
       </motion.section>
     </div>
