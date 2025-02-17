@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+}
+
+/* global.css or similar */
+html {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body {
+  background-color: #fff;
+  color: #333;
+}
+
+.dark body {
+  background-color: #121212;
+  color: #fff;
+}
+
+.dark a {
+  color: #bbb;
+}
+
+.dark a:hover {
+  color: #fff;
+}
+
+@keyframes soft-glow {
+  0% { text-shadow: 0 0 5px rgba(79, 70, 229, 0.5), 0 0 10px rgba(147, 51, 234, 0.4); }
+  50% { text-shadow: 0 0 8px rgba(79, 70, 229, 0.6), 0 0 15px rgba(147, 51, 234, 0.5); }
+  100% { text-shadow: 0 0 5px rgba(79, 70, 229, 0.5), 0 0 10px rgba(147, 51, 234, 0.4); }
+}
+
+.animate-glow {
+  animation: soft-glow 3s infinite alternate ease-in-out;
+}
