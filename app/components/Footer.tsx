@@ -6,9 +6,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
         <div className="mb-4 md:mb-0">
           <Link href="/" className="text-xl font-bold text-blue-600">
-            ResumeAI
+            CV Master AI
           </Link>
-          <p className="text-sm text-gray-600 mt-2">© {new Date().getFullYear()} ResumeAI. All rights reserved.</p>
+          <p className="text-sm text-gray-600 mt-2">© {new Date().getFullYear()} CV Master AI. All rights reserved.</p>
         </div>
         <nav>
           <ul className="flex flex-wrap justify-center space-x-6">
