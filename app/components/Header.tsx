@@ -34,7 +34,7 @@ export default function Header() {
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-          ResumeAI
+          CV Master AI
         </Link>
         <nav>
           <ul className="flex space-x-6 items-center">
