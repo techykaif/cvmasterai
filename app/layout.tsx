@@ -9,7 +9,10 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "AI-Powered Resume Builder",
   description: "Create, customize, and optimize your resume effortlessly using AI.",
+<<<<<<< HEAD
     generator: 'v0.dev'
+=======
+>>>>>>> 21d9fab (updated footer)
 }
 
 export default function RootLayout({

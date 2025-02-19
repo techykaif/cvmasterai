@@ -260,6 +260,7 @@ export default function TemplatesPage() {
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue>{selectedCategory}</SelectValue>
               </SelectTrigger>
+<<<<<<< HEAD
               <SelectContent>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
@@ -267,6 +268,21 @@ export default function TemplatesPage() {
                   </SelectItem>
                 ))}
               </SelectContent>
+=======
+              <SelectContent className="bg-white border border-gray-300 shadow-lg">
+                {categories.map((category) => (
+                  <SelectItem
+                    key={category}
+                    value={category}
+                    className="cursor-pointer hover:bg-gray-100 hover:shadow-md transition-all duration-200 rounded-md px-2 py-1 data-[state=checked]:bg-gray-200"
+                  >
+                    {category}
+                  </SelectItem>
+
+                ))}
+              </SelectContent>
+
+>>>>>>> 21d9fab (updated footer)
             </Select>
             <Input
               type="text"
