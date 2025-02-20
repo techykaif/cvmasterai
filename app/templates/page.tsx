@@ -260,15 +260,6 @@ export default function TemplatesPage() {
               <SelectTrigger className="w-full md:w-[200px]">
                 <SelectValue>{selectedCategory}</SelectValue>
               </SelectTrigger>
-<<<<<<< HEAD
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-=======
               <SelectContent className="bg-white border border-gray-300 shadow-lg">
                 {categories.map((category) => (
                   <SelectItem
@@ -282,7 +273,6 @@ export default function TemplatesPage() {
                 ))}
               </SelectContent>
 
->>>>>>> 21d9fab (updated footer)
             </Select>
             <Input
               type="text"
