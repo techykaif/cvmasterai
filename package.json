@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "name": "my-v0-project",
-=======
   "name": "cvmasterai",
->>>>>>> 21d9fab (updated footer)
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -56,9 +52,6 @@
     "react-day-picker": "8.10.1",
     "react-dom": "^18",
     "react-hook-form": "^7.54.1",
-<<<<<<< HEAD
-=======
->>>>>>> 21d9fab (updated footer)
     "react-parallax-tilt": "^1.7.283",
     "react-resizable-panels": "^2.1.7",
     "react-simple-typewriter": "^5.0.1",

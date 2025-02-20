@@ -45,9 +45,7 @@ body {
 .animate-glow {
   animation: soft-glow 3s infinite alternate ease-in-out;
 }
-<<<<<<< HEAD
-=======
+
 [data-state="checked"] svg {
   display: none;
 }
->>>>>>> 21d9fab (updated footer)
