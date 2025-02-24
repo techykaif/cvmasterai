@@ -1,14 +1,31 @@
 "use client"
 
 import { useState } from "react"
+import { getAuth, sendPasswordResetEmail } from "firebase/auth"
+import { app } from "@/app/firebaseConfig"
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const auth = getAuth(app)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setMessage(`Password reset link sent to ${email}`)
+    setMessage("")
+    setError("")
+    setLoading(true)
+
+    try {
+      await sendPasswordResetEmail(auth, email)
+      setMessage(`Password reset link sent to ${email}`)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -18,6 +35,7 @@ export default function ForgotPassword() {
         <p className="text-sm text-gray-500 mb-4">Enter your email to reset your password.</p>
 
         {message && <p className="text-sm text-green-600 mb-4">{message}</p>}
+        {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -31,8 +49,9 @@ export default function ForgotPassword() {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            Send Reset Link
+            {loading ? "Sending..." : "Send Reset Link"}
           </button>
         </form>
       </div>

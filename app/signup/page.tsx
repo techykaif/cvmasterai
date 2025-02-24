@@ -1,21 +1,87 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { auth, googleProvider } from "@/app/firebaseConfig";
+import { createUserWithEmailAndPassword, signInWithPopup, updateProfile } from "firebase/auth";
 import { Button } from "@/app/components/Button";
 
 const SignUp = () => {
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // 🔒 Password Validator
+  const checkPasswordStrength = (password: string) => {
+    if (password.length < 6) {
+      setPasswordStrength("Too short");
+    } else if (password.match(/[A-Za-z]/) && password.match(/[0-9]/)) {
+      setPasswordStrength("Strong");
+    } else {
+      setPasswordStrength("Weak");
+    }
+  };
+
+  // 🎯 Email/Password Sign-Up
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle your signup logic here (API call, validation, etc.)
-    console.log("Name:", name, "Email:", email, "Phone:", phone, "Password:", password);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match!");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
+      alert("Sign-up successful! 🎉");
+    } catch (err: any) {
+      handleFirebaseError(err.code);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🌐 Google Sign-In
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await signInWithPopup(auth, googleProvider);
+      alert("Google Sign-In successful! 🚀");
+    } catch (err: any) {
+      handleFirebaseError(err.code);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 🛡️ Simplified Firebase Error Messages
+  const handleFirebaseError = (code: string) => {
+    const errorMessages: { [key: string]: string } = {
+      "auth/email-already-in-use": "Email is already in use.",
+      "auth/invalid-email": "Invalid email format.",
+      "auth/weak-password": "Password is too weak.",
+      "auth/network-request-failed": "Network error. Please try again.",
+    };
+
+    setError(errorMessages[code] || "An unexpected error occurred.");
   };
 
   return (
@@ -30,7 +96,7 @@ const SignUp = () => {
           Create Your Account
         </h1>
         <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-          Fill in the details to create your account and start building your dream resume with AI-powered features.
+          Join us and build your AI-powered resume today!
         </p>
       </motion.section>
 
@@ -40,110 +106,118 @@ const SignUp = () => {
         transition={{ duration: 0.8 }}
         className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 transform transition-all duration-500 ease-in-out hover:scale-105"
       >
-        <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-6">
-          {/* Name Field */}
-          <div className="w-full">
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+        <form onSubmit={handleSignUp} className="flex flex-col space-y-6">
+          <div>
             <label htmlFor="name" className="block text-lg font-medium text-gray-700 mb-2">
               Full Name
             </label>
             <input
               type="text"
               id="name"
-              name="name"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
 
-          {/* Email Field */}
-          <div className="w-full">
+          <div>
             <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
               Email Address
             </label>
             <input
               type="email"
               id="email"
-              name="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          {/* Phone Number Field */}
-          <div className="w-full">
+          <div>
             <label htmlFor="phone" className="block text-lg font-medium text-gray-700 mb-2">
-              Phone Number
+              Phone Number 
             </label>
             <input
               type="tel"
               id="phone"
-              name="phone"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              required
             />
           </div>
 
-          {/* Password Field */}
-          <div className="w-full">
-            <label htmlFor="password" className="block text-lg font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+          <div>
+  <label htmlFor="password" className="block text-lg font-medium text-gray-700 mb-2">
+    Password
+  </label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"}
+      id="password"
+      className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
+      value={password}
+      onChange={(e) => {
+        setPassword(e.target.value);
+        checkPasswordStrength(e.target.value);
+      }}
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      className="absolute top-3 right-3 text-sm text-blue-500"
+    >
+      {showPassword ? "Hide" : "Show"}
+    </button>
+  </div>
+  {password && (
+    <p
+      className={`text-sm mt-2 ${
+        passwordStrength === "Strong" ? "text-green-500" : "text-red-500"
+      }`}
+    >
+      Strength: {passwordStrength}
+    </p>
+  )}
+</div>
 
-          {/* Confirm Password Field */}
-          <div className="w-full">
+
+          <div>
             <label htmlFor="confirmPassword" className="block text-lg font-medium text-gray-700 mb-2">
               Confirm Password
             </label>
             <input
               type="password"
               id="confirmPassword"
-              name="confirmPassword"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-400"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
 
-          {/* Sign Up Button */}
-          <div className="w-full flex justify-center">
-            <Button text="Sign Up" type="submit" className="w-full sm:w-1/2 py-3 mt-4" />
-          </div>
+          <Button text={loading ? "Signing Up..." : "Sign Up"} type="submit" disabled={loading} className="w-full py-3" />
 
-          {/* OR Divider */}
-          <div className="w-full text-center text-gray-600">
-            <p className="text-sm">OR</p>
-          </div>
+          <p className="text-center text-gray-600">OR</p>
 
-          {/* Google Sign-In Button */}
-         <div className="w-full flex justify-center">
-            <button className="w-3/4 py-2 px-4 bg-white text-blue-500 border border-blue-500 rounded-lg shadow-md hover:bg-blue-50 hover:shadow-lg transition-all">
-              Sign up with Google
-            </button>
-          </div>
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full py-3 text-blue-500 border border-blue-500 rounded-lg hover:bg-blue-50"
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign up with Google"}
+          </button>
 
-          {/* Already have an account? */}
-          <div className="mt-4 text-center w-full">
-            <p className="text-sm text-gray-600">
-              Already have an account? <Link href="/signin" className="text-blue-500">Sign In</Link>
-            </p>
-          </div>
+          <p className="text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link href="/signin" className="text-blue-500">
+              Sign In
+            </Link>
+          </p>
         </form>
       </motion.section>
     </div>

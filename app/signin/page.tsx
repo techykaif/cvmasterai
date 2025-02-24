@@ -1,18 +1,51 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/app/components/Button";
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { app } from "@/app/firebaseConfig"; // Ensure Firebase is correctly initialized
 
 const SignIn = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle your authentication logic here (API call, validation, etc.)
-    console.log("Email:", email, "Password:", password);
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      setSuccess(`Welcome back, ${userCredential.user.email}!`);
+    } catch (err: any) {
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      setSuccess(`Signed in as ${result.user.displayName || "User"}!`);
+    } catch (err: any) {
+      setError("Google sign-in failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,6 +71,9 @@ const SignIn = () => {
         className="w-full max-w-md bg-white rounded-lg shadow-xl p-8"
       >
         <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-6">
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+          {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
+
           <div className="w-full">
             <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
               Email Address
@@ -68,31 +104,33 @@ const SignIn = () => {
             />
           </div>
 
-          {/* Sign In Button */}
           <div className="w-full flex justify-center">
-            <Button text="Sign In" type="submit" className="w-3/4 py-2 text-lg" />
+            <Button text={loading ? "Signing In..." : "Sign In"} type="submit" className="w-3/4 py-2 text-lg" />
           </div>
 
-          {/* OR Divider */}
           <div className="w-full text-center text-gray-600">
             <p className="text-sm">OR</p>
           </div>
 
-          {/* Google Sign-In Button */}
           <div className="w-full flex justify-center">
-            <button className="w-3/4 py-2 px-4 bg-white text-blue-500 border border-blue-500 rounded-lg shadow-md hover:bg-blue-50 hover:shadow-lg transition-all">
-              Sign in with Google
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-3/4 py-2 px-4 bg-white text-blue-500 border border-blue-500 rounded-lg shadow-md hover:bg-blue-50 hover:shadow-lg transition-all"
+            >
+              {loading ? "Signing in with Google..." : "Sign in with Google"}
             </button>
           </div>
 
-          {/* Forgot Password Option */}
           <div className="text-center w-full">
             <p className="text-sm text-gray-600">
-              <Link href="/forgot-password" className="text-blue-500 hover:underline">Forgot Password?</Link>
+              <Link href="/forgot-password" className="text-blue-500 hover:underline">
+                Forgot Password?
+              </Link>
             </p>
           </div>
 
-          {/* Don't have an account? Create one */}
           <div className="text-center w-full mt-4">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}

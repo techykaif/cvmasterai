@@ -4,10 +4,11 @@ interface ButtonProps {
   text: string;
   href?: string;
   onClick?: () => void;
-  variant?: "primary" | "secondary" | "custom"; // Allow for custom variant
+  variant?: "primary" | "secondary" | "custom";
   size?: "small" | "medium" | "large";
   type?: "button" | "submit" | "reset";
   className?: string;
+  disabled?: boolean; // Add disabled prop
   customStyles?: {
     backgroundColor?: string;
     textColor?: string;
@@ -29,17 +30,21 @@ export function Button({
   size = "medium",
   type = "button",
   className = "",
-  customStyles = {}, // Custom styles object
+  disabled = false, // Default to false
+  customStyles = {},
 }: ButtonProps) {
   const baseClasses =
     "font-semibold transition-all ease-in-out transform inline-flex items-center justify-center relative overflow-hidden";
 
   // Define default styles for variants
   const variantClasses = {
-    primary: "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg",
-    secondary:
-      "bg-gray-200 text-gray-800 border border-gray-400 hover:bg-gray-300 shadow-md",
-    custom: "", // Custom button uses the customStyles prop for styling
+    primary: disabled
+      ? "bg-blue-300 text-white cursor-not-allowed opacity-50"
+      : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg",
+    secondary: disabled
+      ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
+      : "bg-gray-200 text-gray-800 border border-gray-400 hover:bg-gray-300 shadow-md",
+    custom: disabled ? "cursor-not-allowed opacity-50" : "",
   };
 
   // Size classes
@@ -50,15 +55,25 @@ export function Button({
   };
 
   // Combine custom styles with default styles for custom button
-  const customClasses = variant === "custom" ? `${baseClasses} ${customStyles?.backgroundColor} ${customStyles?.textColor} ${customStyles?.borderColor} ${customStyles?.boxShadow}` : `${baseClasses} ${variantClasses[variant]}`;
+  const customClasses =
+    variant === "custom"
+      ? `${baseClasses} ${customStyles?.backgroundColor} ${customStyles?.textColor} ${customStyles?.borderColor} ${customStyles?.boxShadow}`
+      : `${baseClasses} ${variantClasses[variant]}`;
 
-  const hoverClasses = variant === "custom" ? `${customStyles?.hoverBackgroundColor} ${customStyles?.hoverTextColor} hover:scale-${customStyles?.hoverScale || '105'}` : "hover:scale-105";
+  const hoverClasses =
+    !disabled && variant === "custom"
+      ? `${customStyles?.hoverBackgroundColor} ${customStyles?.hoverTextColor} hover:scale-${customStyles?.hoverScale || "105"}`
+      : !disabled
+      ? "hover:scale-105"
+      : "";
 
   const classes = `${customClasses} ${sizeClasses[size]} ${className} ${hoverClasses}`;
 
-  // Button rendering logic
+  // Disable href-based links by rendering a <span> instead
   if (href) {
-    return (
+    return disabled ? (
+      <span className={`${classes} cursor-not-allowed opacity-50`}>{text}</span>
+    ) : (
       <Link href={href} className={classes}>
         {text}
       </Link>
@@ -66,7 +81,7 @@ export function Button({
   }
 
   return (
-    <button type={type} onClick={onClick} className={classes}>
+    <button type={type} onClick={disabled ? undefined : onClick} className={classes} disabled={disabled}>
       {text}
     </button>
   );
