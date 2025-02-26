@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/app/components/Button";
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { app } from "@/app/firebaseConfig"; // Ensure Firebase is correctly initialized
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
+import { app } from "@/app/firebaseConfig";
 
 const SignIn = () => {
   const [email, setEmail] = useState<string>("");
@@ -13,9 +20,23 @@ const SignIn = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [redirecting, setRedirecting] = useState<boolean>(false);
 
   const auth = getAuth(app);
   const googleProvider = new GoogleAuthProvider();
+  const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsLoggedIn(true);
+        setTimeout(() => setRedirecting(true), 800);
+        setTimeout(() => router.push("/dashboard"), 2000);
+      }
+    });
+    return () => unsubscribe();
+  }, [auth, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,6 +47,8 @@ const SignIn = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setSuccess(`Welcome back, ${userCredential.user.email}!`);
+      setTimeout(() => setRedirecting(true), 800);
+      setTimeout(() => router.push("/dashboard"), 2000);
     } catch (err: any) {
       setError("Invalid email or password. Please try again.");
     } finally {
@@ -41,12 +64,47 @@ const SignIn = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setSuccess(`Signed in as ${result.user.displayName || "User"}!`);
+      setTimeout(() => setRedirecting(true), 800);
+      setTimeout(() => router.push("/dashboard"), 2000);
     } catch (err: any) {
       setError("Google sign-in failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (redirecting) {
+    return (
+      <motion.div
+        className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <motion.div
+          className="text-center"
+          initial={{ scale: 0.8 }}
+          animate={{ scale: 1.2 }}
+          transition={{ yoyo: Infinity, duration: 0.6 }}
+        >
+          <motion.div
+            className="w-16 h-16 border-t-4 border-white rounded-full animate-spin mx-auto"
+            initial={{ rotate: 0 }}
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1 }}
+          ></motion.div>
+          <motion.p
+            className="text-white text-xl font-semibold mt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            Redirecting to your dashboard...
+          </motion.p>
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8 md:py-16">
@@ -72,7 +130,15 @@ const SignIn = () => {
       >
         <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-6">
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          {success && <p className="text-green-500 text-sm mb-4">{success}</p>}
+          {success && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-green-500 text-sm mb-4"
+            >
+              {success}
+            </motion.p>
+          )}
 
           <div className="w-full">
             <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
