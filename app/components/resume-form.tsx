@@ -22,6 +22,27 @@ import SkillsForm from "./resume-sections/skills-form"
 import ProjectsForm from "./resume-sections/projects-form"
 import { useResume } from "./resume-context"
 import { cn } from "@/lib/utils"
+import html2pdf from "html2pdf.js"
+
+const exportPDF = () => {
+  const element = document.getElementById("resume-preview")
+  if (!element) {
+    console.error("Resume preview not found!")
+    return
+  }
+
+  html2pdf()
+    .from(element)
+    .set({
+      margin: [10, 10, 10, 10],
+      filename: "Resume.pdf",
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: { scale: 3, useCORS: true },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    })
+    .save()
+}
+
 
 type ResumeFormProps = {
   activeSection?: string
@@ -143,6 +164,7 @@ export default function ResumeForm({
           <Download className="w-5 h-5" />
           Export PDF
         </Button>
+
       </header>
 
       {/* Progress Bar */}
@@ -158,18 +180,20 @@ export default function ResumeForm({
       <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
         <TabsList className="flex overflow-x-auto gap-2 bg-gray-100 rounded-full p-2 mb-6 no-scrollbar">
           {tabs.map((tab) => (
-            <TabsTrigger
-              key={tab.value}
-              value={tab.value}
-              className={cn(
-                "flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full font-medium text-sm transition-all",
-                activeSection === tab.value
-                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
-                  : "bg-white text-gray-800 hover:bg-blue-50",
-              )}
-            >
-              <tab.icon className="h-4 w-4 md:h-5 md:w-5" />
-              <span>{tab.label}</span>
+            <div key={tab.value} className="relative flex items-center gap-2">
+              <TabsTrigger
+                value={tab.value}
+                className={cn(
+                  "flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full font-medium text-sm transition-all",
+                  activeSection === tab.value
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                    : "bg-white text-gray-800 hover:bg-blue-50",
+                )}
+              >
+                <tab.icon className="h-4 w-4 md:h-5 md:w-5" />
+                <span>{tab.label}</span>
+              </TabsTrigger>
+
               {tab.custom && (
                 <div className="flex gap-1 ml-1">
                   <Button
@@ -188,6 +212,7 @@ export default function ResumeForm({
                   >
                     <Edit className="h-3 w-3" />
                   </Button>
+
                   <Button
                     variant="ghost"
                     size="icon"
@@ -203,8 +228,9 @@ export default function ResumeForm({
                   </Button>
                 </div>
               )}
-            </TabsTrigger>
+            </div>
           ))}
+
           <Button
             onClick={handleAddCustomSection}
             className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-3 rounded-full font-medium text-sm bg-white text-gray-800 hover:bg-blue-50"
@@ -215,7 +241,7 @@ export default function ResumeForm({
         </TabsList>
 
         {/* Tab Content */}
-        <div className="p-6 md:p-8 mt-2 bg-gray-50 rounded-2xl shadow-sm max-h-[60vh] overflow-y-auto no-scrollbar">
+        <div id="resume-preview" className="p-6 md:p-8 mt-2 bg-gray-50 rounded-2xl shadow-sm max-h-[60vh] overflow-y-auto no-scrollbar">
           <TabsContent value="personal" className="mt-0">
             <PersonalInfoForm />
           </TabsContent>

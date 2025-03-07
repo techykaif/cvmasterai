@@ -13,6 +13,24 @@ import { Slider } from "@/components/ui/slider"
 import { Badge } from "@/components/ui/badge"
 import { Trash2, Lightbulb, Star } from "lucide-react"
 
+const skillSuggestions = [
+  "JavaScript",
+  "Python",
+  "React",
+  "Node.js",
+  "TypeScript",
+  "HTML",
+  "CSS",
+  "Next.js",
+  "Tailwind CSS",
+  "SQL",
+  "MongoDB",
+  "Docker",
+  "Kubernetes",
+  "AWS",
+  "Firebase",
+]
+
 export default function SkillsForm() {
   const { resumeData, addSkill, updateSkill, removeSkill } = useResume()
   const { skills } = resumeData
@@ -23,10 +41,25 @@ export default function SkillsForm() {
   })
 
   const [editMode, setEditMode] = useState<string | null>(null)
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    if (name === "name") {
+      const filtered = skillSuggestions.filter((skill) =>
+        skill.toLowerCase().startsWith(value.toLowerCase())
+      )
+      setFilteredSuggestions(filtered)
+      setShowSuggestions(!!value)
+    }
+  }
+
+  const handleSelectSuggestion = (skill: string) => {
+    setFormData((prev) => ({ ...prev, name: skill }))
+    setShowSuggestions(false)
   }
 
   const handleSliderChange = (value: number[]) => {
@@ -49,6 +82,7 @@ export default function SkillsForm() {
       name: "",
       level: 3,
     })
+    setShowSuggestions(false)
   }
 
   const handleEdit = (id: string) => {
@@ -68,6 +102,7 @@ export default function SkillsForm() {
       level: 3,
     })
     setEditMode(null)
+    setShowSuggestions(false)
   }
 
   const getLevelLabel = (level: number) => {
@@ -119,7 +154,7 @@ export default function SkillsForm() {
         </h3>
 
         <div className="space-y-4">
-          <div className="space-y-2">
+          <div className="space-y-2 relative">
             <Label htmlFor="name" className="flex items-center gap-2">
               Skill Name
             </Label>
@@ -132,15 +167,33 @@ export default function SkillsForm() {
               className="focus:ring-2 focus:ring-blue-500"
               required
             />
+            {showSuggestions && (
+              <ul className="absolute z-10 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 max-h-40 overflow-auto">
+                {filteredSuggestions.length > 0 ? (
+                  filteredSuggestions.map((skill) => (
+                    <li
+                      key={skill}
+                      onClick={() => handleSelectSuggestion(skill)}
+                      className="px-4 py-2 cursor-pointer hover:bg-blue-100 text-sm"
+                    >
+                      {skill}
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-sm text-gray-500">No suggestions</li>
+                )}
+              </ul>
+            )}
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
               <Label htmlFor="level" className="flex items-center gap-2">
                 Proficiency Level
               </Label>
               <span className="text-sm font-medium">{getLevelLabel(formData.level)}</span>
             </div>
+
             <Slider
               id="level"
               min={1}
@@ -148,9 +201,10 @@ export default function SkillsForm() {
               step={1}
               value={[formData.level]}
               onValueChange={handleSliderChange}
-              className="py-4"
+              className="w-full h-3 rounded-lg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 cursor-pointer"
             />
-            <div className="flex justify-between text-xs text-gray-500">
+
+            <div className="flex justify-between text-xs text-gray-500 mt-2">
               <span>Beginner</span>
               <span>Expert</span>
             </div>
@@ -222,4 +276,3 @@ export default function SkillsForm() {
     </div>
   )
 }
-

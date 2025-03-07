@@ -189,10 +189,41 @@ export default function ExperienceForm() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Switch id="current" checked={formData.current} onCheckedChange={handleSwitchChange} />
-          <Label htmlFor="current">I currently work here</Label>
-        </div>
+        <div className="flex items-center gap-4">
+  <div className="relative flex items-center">
+    <input
+      type="checkbox"
+      id="current"
+      checked={formData.current}
+      onChange={(e) => handleSwitchChange(e.target.checked)}
+      className="sr-only"
+    />
+    <div
+      className={`w-14 h-8 flex items-center rounded-full p-1 cursor-pointer transition-colors ${
+        formData.current ? "bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg" : "bg-gray-300"
+      }`}
+      onClick={() => handleSwitchChange(!formData.current)}
+    >
+      <motion.div
+        className="w-6 h-6 bg-white rounded-full shadow-md"
+        animate={{
+          x: formData.current ? 24 : 0,
+          backgroundColor: formData.current ? "#ffffff" : "#ffffff",
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      />
+    </div>
+  </div>
+  <Label
+    htmlFor="current"
+    className={`text-sm font-medium transition-colors ${
+      formData.current ? "text-blue-700" : "text-gray-800"
+    }`}
+  >
+    I currently work here
+  </Label>
+</div>
+
 
         <div className="space-y-2">
           <Label htmlFor="description" className="flex items-center gap-2">
