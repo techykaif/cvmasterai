@@ -1,6 +1,5 @@
 "use client";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { FileText, Palette, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -29,10 +28,10 @@ export default function CreateResume() {
       >
         {/* Custom Resume Card */}
         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Card className="relative group hover:shadow-lg transition-shadow">
-            <Link href="/create/custom" className="absolute inset-0">
-              <span className="sr-only">Create custom resume</span>
-            </Link>
+          <Card 
+            className="relative group hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => router.push("/custom")}
+          >
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <Palette className="w-6 h-6 text-primary" />
@@ -56,7 +55,10 @@ export default function CreateResume() {
 
         {/* Templates Card */}
         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Card className="relative group hover:shadow-lg transition-shadow">
+          <Card 
+            className="relative group hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => router.push("/templates")}
+          >
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <FileText className="w-6 h-6 text-primary" />
@@ -71,7 +73,7 @@ export default function CreateResume() {
                 <li>Easy customization</li>
                 <li>ATS-friendly formats</li>
               </ul>
-              <Button className="w-full" variant="outline" onClick={() => router.push("/templates")}>
+              <Button className="w-full" variant="outline">
                 Browse Templates
               </Button>
             </CardContent>
@@ -80,7 +82,10 @@ export default function CreateResume() {
 
         {/* AI-Powered Resume Card */}
         <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Card className="relative group hover:shadow-lg transition-shadow">
+          <Card 
+            className="relative group hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => router.push("/create/ai")}
+          >
             <CardHeader className="text-center pb-4">
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <Sparkles className="w-6 h-6 text-primary" />
@@ -95,7 +100,7 @@ export default function CreateResume() {
                 <li>Instant resume creation</li>
                 <li>Customizable sections</li>
               </ul>
-              <Button className="w-full" variant="outline" onClick={() => router.push("/create/ai")}>
+              <Button className="w-full" variant="outline">
                 Generate with AI
               </Button>
             </CardContent>
