@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Upload as UploadIcon, FileText, CheckCircle2, Sparkles } from "lucide-react";
+import { Upload as UploadIcon, CheckCircle2, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 

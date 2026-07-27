@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Lightbulb, Shield, Zap, ArrowRight } from "lucide-react";
+import { Lightbulb, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { InteractiveHoverButton } from "../components/ui/InteractiveHoverButton";

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 import { useState } from "react";
 import { InteractiveHoverButton } from "../components/ui/InteractiveHoverButton";
 
@@ -14,8 +14,8 @@ export default function ContactPage() {
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
-      alert("Message sent successfully!");
-    }, 1500);
+      window.location.href = "mailto:support@cvmasterai.com";
+    }, 500);
   };
 
   return (

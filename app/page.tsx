@@ -87,7 +87,10 @@ export default function Home() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
           
           <div className="text-center mb-10 relative z-10">
-            <h2 className="text-3xl font-bold text-foreground mb-4">AI-Powered Features</h2>
+            <div className="inline-flex items-center gap-2 mb-2">
+              <h2 className="text-3xl font-bold text-foreground">AI-Powered Features</h2>
+              <span className="px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold shadow-sm">Coming Soon</span>
+            </div>
             <p className="text-muted-foreground">Everything you need to bypass filters and impress humans.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">

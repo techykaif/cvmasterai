@@ -7,29 +7,9 @@ import { Download, Star, X } from "lucide-react"
 import { Button } from "../components/Button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog"
 
 const templateData = [
-  {
-    id: "modern-professional",
-    name: "Modern Professional",
-    description: "Clean and modern template perfect for corporate roles",
-    category: "Professional",
-    rating: 4.9,
-    downloads: "15k+",
-    image: "/placeholder.svg",
-    popular: true,
-  },
-  {
-    id: "tech-innovator",
-    name: "Tech Innovator",
-    description: "Perfect for IT and software roles",
-    category: "Technical",
-    rating: 4.8,
-    downloads: "12k+",
-    image: "/placeholder.svg",
-    popular: true,
-  },
   {
     id: "creative-edge-1",
     name: "Dancer Creative Resume",
@@ -192,6 +172,7 @@ const templateData = [
     rating: 5.0,
     downloads: "8k+",
     image: "/placeholder.svg",
+    wordFile: "/templates-data/executive-pro.docx",
     popular: false,
   },
   {
@@ -202,6 +183,7 @@ const templateData = [
     rating: 4.9,
     downloads: "11k+",
     image: "/placeholder.svg",
+    wordFile: "/templates-data/minimal-impact.docx",
     popular: false,
   },
   {
@@ -212,7 +194,30 @@ const templateData = [
     rating: 4.9,
     downloads: "7k+",
     image: "/placeholder.svg",
+    wordFile: "/templates-data/academic-excellence.docx",
     popular: false,
+  },
+  {
+    id: "modern-professional",
+    name: "Modern Professional",
+    description: "Clean and modern template perfect for corporate roles",
+    category: "Professional",
+    rating: 4.9,
+    downloads: "15k+",
+    image: "/placeholder.svg",
+    wordFile: "/templates-data/modern-professional.docx",
+    popular: true,
+  },
+  {
+    id: "tech-innovator",
+    name: "Tech Innovator",
+    description: "Perfect for IT and software roles",
+    category: "Technical",
+    rating: 4.8,
+    downloads: "12k+",
+    image: "/placeholder.svg",
+    wordFile: "/templates-data/tech-innovator.docx",
+    popular: true,
   },
 ]
 
@@ -239,10 +244,7 @@ export default function TemplatesPage() {
     setIsModalOpen(true)
   }
 
-  const closeModal = () => {
-    setIsModalOpen(false)
-  }
-
+  
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Subtle Background Pattern */}
