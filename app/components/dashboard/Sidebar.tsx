@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { Home, PlusCircle, Upload, Settings, LogOut, ChevronLeft, ChevronRight } from "lucide-react"
+import { Home, PlusCircle, Upload, Settings, LogOut, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 import { getAuth, signOut } from "firebase/auth"
 import { app } from "@/app/firebaseConfig"
 
@@ -42,60 +42,71 @@ export function Sidebar({ setIsLoggingOut }: { setIsLoggingOut: (value: boolean)
 
   return (
     <aside
-      className={`bg-gray-900 text-white shadow-lg ${
+      className={`bg-gray-950 text-white shadow-lg ${
         isOpen ? "w-64" : "w-20"
-      } transition-all duration-300 ease-in-out rounded-r-lg overflow-hidden ${
+      } transition-all duration-300 ease-in-out border-r border-gray-800 flex flex-col relative ${
         isLoggingOut ? "opacity-50 translate-y-2" : "opacity-100"
       }`}
     >
-      <div className="p-4 flex flex-col h-full">
-
+      {/* Header */}
+      <div className="p-4 flex items-center justify-between min-h-[72px]">
+        <div className={`flex items-center gap-3 transition-opacity duration-300 ${isOpen ? "opacity-100" : "opacity-0 hidden"}`}>
+          <img src="/icon.jpg" alt="CV Master AI Logo" className="w-8 h-8 shrink-0 rounded-lg shadow-md shadow-indigo-500/20" />
+          <span className="font-semibold text-white whitespace-nowrap">CV Master AI</span>
+        </div>
+        
         {/* Collapse Button */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="text-blue-400 hover:text-blue-500 transition-colors text-lg mb-6 self-start flex items-center gap-2"
+          className={`p-1.5 rounded-lg bg-gray-800 text-gray-400 hover:text-white transition-colors ${!isOpen ? "mx-auto" : ""}`}
         >
-          {isOpen ? <ChevronLeft className="w-5 h-5 rotate-180 transition-transform duration-300" /> : <ChevronRight className="w-5 h-5 transition-transform duration-300" />}
-          {isOpen && <span className="transition-opacity duration-300 ease-in-out opacity-100">Collapse</span>}
+          {isOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
         </button>
+      </div>
 
-        {/* Navigation items */}
-        <nav className="flex-grow">
-          <ul>
-            {menuItems.map((item) => (
-              <li key={item.href} className="mb-3">
+      {/* Navigation items */}
+      <nav className="flex-grow px-3 py-4">
+        <ul className="space-y-1">
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <li key={item.href}>
                 <button
                   onClick={() => handleNavigation(item.href)}
-                  className={`flex items-center gap-4 p-3 rounded-lg w-full text-left text-sm font-medium transition-all duration-300 ${
-                    pathname === item.href
-                      ? "bg-blue-500 text-white"
-                      : "hover:bg-gray-700"
-                  }`}
+                  className={`flex items-center gap-3 p-3 rounded-xl w-full text-left text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? "bg-indigo-500/10 text-indigo-400"
+                      : "text-gray-400 hover:bg-gray-800/50 hover:text-gray-200"
+                  } ${!isOpen ? "justify-center" : ""}`}
                 >
-                  <item.icon className={`w-6 h-6 transform transition-transform duration-300 ${pathname === item.href ? "scale-110" : ""}`} />
-                  <span className={`transition-opacity duration-300 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 hidden"}`}>
-                    {item.label}
-                  </span>
+                  <item.icon className={`w-5 h-5 shrink-0 ${isActive ? "text-indigo-400" : "text-gray-400"}`} />
+                  {isOpen && (
+                    <span className="truncate">
+                      {item.label}
+                    </span>
+                  )}
                 </button>
               </li>
-            ))}
-          </ul>
-        </nav>
+            )
+          })}
+        </ul>
+      </nav>
 
-        {/* Logout button */}
-        <div className="mt-auto">
-          <button
-            onClick={handleLogout}
-            className={`flex items-center gap-4 p-3 rounded-lg w-full text-left text-sm font-medium hover:bg-red-600 transition-all duration-300 ${
-              isLoggingOut ? "opacity-50 translate-y-2" : "opacity-100"
-            }`}
-          >
-            <LogOut className={`w-6 h-6 transform transition-transform duration-300 ${isLoggingOut ? "rotate-90" : "hover:rotate-12"}`} />
-            <span className={`transition-opacity duration-300 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 hidden"}`}>
+      {/* Logout button */}
+      <div className="p-3 border-t border-gray-800 mt-auto">
+        <button
+          onClick={handleLogout}
+          className={`flex items-center gap-3 p-3 rounded-xl w-full text-left text-sm font-medium text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200 ${
+            !isOpen ? "justify-center" : ""
+          }`}
+        >
+          <LogOut className={`w-5 h-5 shrink-0 ${isLoggingOut ? "animate-pulse" : ""}`} />
+          {isOpen && (
+            <span className="truncate">
               Logout
             </span>
-          </button>
-        </div>
+          )}
+        </button>
       </div>
     </aside>
   )

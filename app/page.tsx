@@ -7,137 +7,149 @@ import { motion } from "framer-motion"
 import { Typewriter } from "react-simple-typewriter"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation } from "swiper/modules"
+import { ArrowRight, Zap } from "lucide-react"
 import "swiper/css"
 import "swiper/css/navigation"
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-center px-6">
+    <div className="flex flex-col items-center justify-center w-full overflow-hidden">
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+
       {/* Hero Section */}
       <motion.section
-        initial={{ opacity: 0, y: -30 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center mt-20 mb-16"
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-5xl text-center mt-12 mb-16 px-6"
       >
-        {/* Fixed width to prevent layout shift */}
-        <h1
-          className="text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 drop-shadow-lg mb-6 animate-glow"
-          style={{ minHeight: "80px" }} // Prevents layout shifts
-        >
-          <Typewriter
-            words={["AI-Powered Resume Builder", "Optimize Your Resume Instantly", "Land Your Dream Job"]}
-            loop={true}
-          />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
+          <Zap className="w-3.5 h-3.5" />
+          <span>Next-Gen Resume Building</span>
+        </div>
+        
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6 leading-tight">
+          Ship a resume that <br className="hidden md:block" />
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-500">
+            <Typewriter
+              words={["looks like you.", "beats the ATS.", "lands the job."]}
+              loop={true}
+              cursor
+              cursorStyle="|"
+              typeSpeed={70}
+              deleteSpeed={50}
+              delaySpeed={2000}
+            />
+          </span>
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-          Create, customize, and optimize your resume effortlessly using cutting-edge AI technology. Stand out from the
-          crowd and land your dream job!
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          Create, customize, and optimize your resume effortlessly using cutting-edge AI. Built for professionals who want to stand out.
         </p>
-        <div className="flex gap-6 justify-center">
-          <Button text="Create New Resume" href="/create" />
-          <Button text="Upload Resume" href="/upload" variant="secondary" />
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Button text="Start Building Free" href="/create" />
+          <Button text="View Templates" href="/templates" variant="secondary" />
         </div>
       </motion.section>
 
       {/* How It Works Section */}
       <motion.section
         whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 40 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="w-full max-w-5xl mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, margin: "-50px" }}
+        className="w-full max-w-6xl px-6 mb-20"
       >
-        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <FeatureCard icon="PenTool" title="Create or Upload" description="Start from scratch or upload your existing resume to get started." />
-          <FeatureCard icon="Cpu" title="AI Enhancement" description="Our AI analyzes and optimizes your resume for maximum impact." />
-          <FeatureCard icon="Download" title="Export & Apply" description="Download your polished resume in multiple formats and start applying!" />
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-foreground mb-4">How It Works</h2>
+          <p className="text-muted-foreground">Three simple steps to your next career move.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <FeatureCard icon="PenTool" title="Create or Upload" description="Start from scratch or upload your existing resume to get started instantly." />
+          <FeatureCard icon="Cpu" title="AI Enhancement" description="Our AI analyzes and optimizes your content to match what recruiters want." />
+          <FeatureCard icon="Download" title="Export & Apply" description="Download a pristine, ATS-friendly PDF and start applying with confidence." />
         </div>
       </motion.section>
 
       {/* AI-Powered Features Section */}
       <motion.section
         whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 40 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="w-full max-w-5xl mb-16 bg-gray-50 py-12 px-6 rounded-lg"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, margin: "-50px" }}
+        className="w-full max-w-6xl px-6 mb-20"
       >
-        <h2 className="text-3xl font-bold text-center mb-8">AI-Powered Features</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <FeatureCard icon="FileText" title="Content Optimization" description="AI suggests improvements to make your resume more impactful and ATS-friendly." />
-          <FeatureCard icon="Briefcase" title="Job Matching" description="Our AI matches your skills and experience with job descriptions for better targeting." />
-          <FeatureCard icon="Layers" title="Design Customization" description="AI-powered design suggestions to make your resume visually appealing and professional." />
-          <FeatureCard icon="Zap" title="Instant Feedback" description="Get real-time suggestions and improvements as you build your resume." />
+        <div className="bg-card border border-border/50 shadow-sm py-14 px-6 md:px-12 rounded-3xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+          
+          <div className="text-center mb-10 relative z-10">
+            <h2 className="text-3xl font-bold text-foreground mb-4">AI-Powered Features</h2>
+            <p className="text-muted-foreground">Everything you need to bypass filters and impress humans.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+            <FeatureCard icon="FileText" title="Content Optimization" description="AI rewrites your bullet points to make them more impactful and metrics-driven." />
+            <FeatureCard icon="Briefcase" title="Job Matching" description="Paste a job description and let AI tailor your resume to match it perfectly." />
+            <FeatureCard icon="Layers" title="Crafted Layouts" description="Pixel-perfect templates designed by industry professionals for maximum readability." />
+            <FeatureCard icon="Zap" title="Real-time Feedback" description="Get instant suggestions and ATS scoring as you build your resume." />
+          </div>
         </div>
       </motion.section>
 
-      {/* Testimonials Section (Auto-Scrolling with Navigation Buttons) */}
+      {/* Testimonials Section */}
       <motion.section
         whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 40 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="w-full max-w-5xl mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, margin: "-50px" }}
+        className="w-full max-w-4xl px-6 mb-24"
       >
-        <h2 className="text-3xl font-bold text-center mb-8">What Our Users Say</h2>
-        <Swiper
-          spaceBetween={30}
-          slidesPerView={1}
-          navigation={{ nextEl: ".next-btn", prevEl: ".prev-btn" }}
-          modules={[Navigation]}
-          autoplay={{ delay: 3000 }}
-        >
-          <SwiperSlide>
-            <TestimonialCard
-              quote="This AI-powered resume builder helped me land my dream job! The suggestions were spot-on and really made my resume stand out."
-              author="Sarah J., Software Engineer"
-            />
-          </SwiperSlide>
-          <SwiperSlide>
-            <TestimonialCard
-              quote="I was skeptical at first, but the AI recommendations truly enhanced my resume. It's like having a professional resume writer at your fingertips!"
-              author="Michael T., Marketing Manager"
-            />
-          </SwiperSlide>
-        </Swiper>
-        {/* Navigation Buttons */}
-        <div className="flex justify-center gap-6 mt-6">
-          {/* Previous Button */}
-          <button
-            className="prev-btn px-3 py-2 bg-blue-400 text-white rounded-full transform transition-all duration-300 ease-in-out hover:bg-blue-700 hover:scale-105 focus:outline-none shadow-md"
-            style={{ fontSize: "1.2rem" }}
+        <h2 className="text-3xl font-bold text-center text-foreground mb-10">What Our Users Say</h2>
+        <div className="relative">
+          <Swiper
+            spaceBetween={24}
+            slidesPerView={1}
+            navigation={{ nextEl: ".next-btn", prevEl: ".prev-btn" }}
+            modules={[Navigation]}
+            className="pb-12"
           >
-            ←
-          </button>
-
-          {/* Next Button */}
-          <button
-            className="next-btn px-3 py-2 bg-blue-400 text-white rounded-full transform transition-all duration-300 ease-in-out hover:bg-blue-700 hover:scale-105 focus:outline-none shadow-md"
-            style={{ fontSize: "1.2rem" }}
-          >
-            →
-          </button>
+            <SwiperSlide>
+              <TestimonialCard
+                quote="This AI builder helped me land my dream job! The suggestions were spot-on and really made my experience stand out."
+                author="Sarah J., Software Engineer"
+              />
+            </SwiperSlide>
+            <SwiperSlide>
+              <TestimonialCard
+                quote="I was skeptical at first, but the AI recommendations truly enhanced my resume. It's like having a professional resume writer."
+                author="Michael T., Marketing Manager"
+              />
+            </SwiperSlide>
+          </Swiper>
+          {/* Custom Navigation */}
+          <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-4 z-10">
+            <button className="prev-btn p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-sm">
+              <ArrowRight className="w-5 h-5 rotate-180" />
+            </button>
+            <button className="next-btn p-2 rounded-full border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-accent transition-colors shadow-sm">
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
         </div>
-
-
-
       </motion.section>
 
-      {/* Call-to-Action Section */}
+      {/* CTA Section */}
       <motion.section
         whileInView={{ opacity: 1, y: 0 }}
-        initial={{ opacity: 0, y: 40 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-        className="w-full max-w-3xl mb-20 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, margin: "-50px" }}
+        className="w-full max-w-3xl px-6 mb-24 text-center"
       >
-        <h2 className="text-3xl font-bold mb-6">Ready to Supercharge Your Resume?</h2>
-        <p className="text-xl text-gray-600 mb-8">
-          Join thousands of job seekers who have already boosted their careers with our AI-powered resume builder.
+        <h2 className="text-4xl font-bold text-foreground mb-4">Ready to Supercharge Your Career?</h2>
+        <p className="text-lg text-muted-foreground mb-8">
+          Join thousands of job seekers who have already boosted their interview rates with our AI-powered resume builder.
         </p>
-        <Button text="Get Started Now" href="/create" size="medium" />
+        <Button text="Get Started for Free" href="/create" />
       </motion.section>
     </div>
   )

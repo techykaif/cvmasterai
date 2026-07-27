@@ -61,40 +61,50 @@ export default function Header() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="w-full py-4 px-4 sm:px-6 bg-background/80 backdrop-blur-md sticky top-0 z-50 shadow-lg"
+      className="w-full py-4 px-4 sm:px-6 sticky top-0 z-50 transition-all duration-300 bg-background/80 backdrop-blur-xl border-b border-border/40"
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
-        <Link href="/" className="text-2xl font-bold text-primary">
-          <motion.span initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
-            CV Master AI
+      <div className="max-w-7xl mx-auto flex justify-between items-center h-12">
+        <Link href="/" className="flex items-center gap-3 group">
+          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
+            <img src="/icon.jpg" alt="CV Master AI Logo" className="w-9 h-9 rounded-xl shadow-sm border border-border/50 group-hover:shadow-indigo-500/25 transition-all duration-300" />
+          </motion.div>
+          <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="text-xl font-bold text-foreground">
+            CV Master<span className="text-indigo-600">AI</span>
           </motion.span>
         </Link>
 
         <nav className="hidden md:block">
-          <ul className="flex space-x-6 items-center">
+          <ul className="flex space-x-1 items-center bg-secondary/30 rounded-full px-2 py-1.5 border border-border/50">
             <NavLink href="/templates">Templates</NavLink>
             <NavLink href="/about">About</NavLink>
+            
+            <li className="w-px h-5 bg-border mx-2" />
+
             {user ? (
-              <li className="relative">
-                <div className="flex items-center space-x-2 cursor-pointer" onClick={toggleDropdown}>
-                  <span className="text-muted-foreground">{user.email}</span>
-                  <ChevronDown className="w-4 h-4 text-muted-foreground hover:text-primary transition-colors" />
+              <li className="relative pl-1">
+                <div className="flex items-center space-x-2 cursor-pointer px-3 py-1.5 rounded-full hover:bg-secondary transition-colors" onClick={toggleDropdown}>
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold shadow-sm">
+                    {user.email?.[0]?.toUpperCase() || "U"}
+                  </div>
+                  <span className="text-sm font-medium text-foreground max-w-[120px] truncate">{user.email}</span>
+                  <ChevronDown className="w-4 h-4 text-muted-foreground transition-colors" />
                 </div>
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <motion.ul
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute right-0 mt-6 w-48 bg-background shadow-lg rounded-lg overflow-hidden"
+                      initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 mt-3 w-52 bg-card shadow-xl shadow-black/5 rounded-2xl overflow-hidden border border-border p-1"
                     >
                       <DropdownItem href="/dashboard">Dashboard</DropdownItem>
-                      <li>
+                      <li className="border-t border-border mt-1 pt-1">
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left block px-4 py-2 hover:bg-primary/20 transition-colors"
+                          className="w-full text-left block px-3 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-500/10 hover:text-red-600 transition-colors"
                         >
-                          {isLoading ? "Logging out..." : "Logout"}
+                          {isLoading ? "Logging out..." : "Sign Out"}
                         </button>
                       </li>
                     </motion.ul>
@@ -103,11 +113,11 @@ export default function Header() {
               </li>
             ) : (
               <>
-                <li>
-                  <Button text="Sign In" href="/signin" variant="secondary" size="small" />
+                <li className="pl-2 pr-1">
+                  <Button text="Sign In" href="/signin" variant="custom" customStyles={{ backgroundColor: "transparent", textColor: "text-muted-foreground", hoverTextColor: "hover:text-foreground" }} size="small" />
                 </li>
                 <li>
-                  <Button text="Sign Up" href="/signup" size="small" />
+                  <Button text="Get Started" href="/signup" size="small" />
                 </li>
               </>
             )}
@@ -136,10 +146,8 @@ export default function Header() {
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <li>
-      <Link href={href} className="text-muted-foreground hover:text-primary transition-colors">
-        <motion.span whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
-          {children}
-        </motion.span>
+      <Link href={href} className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary transition-all block">
+        {children}
       </Link>
     </li>
   )
