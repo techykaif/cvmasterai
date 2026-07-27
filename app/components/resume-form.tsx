@@ -22,14 +22,15 @@ import SkillsForm from "./resume-sections/skills-form"
 import ProjectsForm from "./resume-sections/projects-form"
 import { useResume } from "./resume-context"
 import { cn } from "@/lib/utils"
-import html2pdf from "html2pdf.js"
 
-const exportPDF = () => {
+const exportPDF = async () => {
   const element = document.getElementById("resume-preview")
   if (!element) {
     console.error("Resume preview not found!")
     return
   }
+
+  const html2pdf = (await import("html2pdf.js")).default
 
   html2pdf()
     .from(element)

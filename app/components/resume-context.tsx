@@ -1,8 +1,6 @@
 "use client"
 
 import React, { createContext, useContext, useState, type ReactNode } from "react"
-import { jsPDF } from "jspdf"
-import html2canvas from "html2canvas"
 
 // Define types for resume data
 export type PersonalInfo = {
@@ -260,6 +258,9 @@ export function ResumeProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      const html2canvas = (await import("html2canvas")).default
+      const { jsPDF } = await import("jspdf")
+
       const canvas = await html2canvas(resumeElement, {
         scale: 2,
         logging: false,
