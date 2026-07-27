@@ -1,214 +1,185 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion } from "framer-motion";
 import Link from "next/link";
-import { Button } from "@/app/components/Button";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-} from "firebase/auth";
-import { app } from "@/app/firebaseConfig";
+import { LogIn, Mail, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "../firebaseConfig";
 
-const SignIn = () => {
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [redirecting, setRedirecting] = useState<boolean>(false);
+export default function SignInPage() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const auth = getAuth(app);
-  const googleProvider = new GoogleAuthProvider();
   const router = useRouter();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setIsLoggedIn(true);
-        setTimeout(() => setRedirecting(true), 800);
-        setTimeout(() => router.push("/dashboard"), 2000);
-      }
-    });
-    return () => unsubscribe();
-  }, [auth, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-    setSuccess(null);
-
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      setSuccess(`Welcome back, ${userCredential.user.email}!`);
-      setTimeout(() => setRedirecting(true), 800);
-      setTimeout(() => router.push("/dashboard"), 2000);
-    } catch (err: any) {
-      setError("Invalid email or password. Please try again.");
+      await signInWithEmailAndPassword(auth, email, password);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error signing in:", error);
+      alert("Failed to sign in. Please check your credentials.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
     try {
-      const result = await signInWithPopup(auth, googleProvider);
-      setSuccess(`Signed in as ${result.user.displayName || "User"}!`);
-      setTimeout(() => setRedirecting(true), 800);
-      setTimeout(() => router.push("/dashboard"), 2000);
-    } catch (err: any) {
-      setError("Google sign-in failed. Please try again.");
-    } finally {
-      setLoading(false);
+      await signInWithPopup(auth, googleProvider);
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      alert("Failed to sign in with Google.");
     }
   };
 
-  if (redirecting) {
-    return (
-      <motion.div
-        className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 to-purple-500"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
-        <motion.div
-          className="text-center"
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1.2 }}
-          transition={{ yoyo: Infinity, duration: 0.6 }}
-        >
-          <motion.div
-            className="w-16 h-16 border-t-4 border-white rounded-full animate-spin mx-auto"
-            initial={{ rotate: 0 }}
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1 }}
-          ></motion.div>
-          <motion.p
-            className="text-white text-xl font-semibold mt-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            Redirecting to your dashboard...
-          </motion.p>
-        </motion.div>
-      </motion.div>
-    );
-  }
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8 md:py-16">
-      <motion.section
-        initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-center mb-16"
-      >
-        <h1 className="text-4xl sm:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 mb-6">
-          Sign In to Your Account
-        </h1>
-        <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto mb-1">
-          Enter your credentials to access your AI-powered resume builder and start creating your dream resume.
-        </p>
-      </motion.section>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden"
+    >
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="w-full max-w-md bg-white rounded-lg shadow-xl p-8"
-      >
-        <form onSubmit={handleSubmit} className="flex flex-col items-center space-y-6">
-          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          {success && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-green-500 text-sm mb-4"
-            >
-              {success}
-            </motion.p>
-          )}
-
-          <div className="w-full">
-            <label htmlFor="email" className="block text-lg font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="w-full">
-            <label htmlFor="password" className="block text-lg font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <div className="w-full flex justify-center">
-            <Button text={loading ? "Signing In..." : "Sign In"} type="submit" className="w-3/4 py-2 text-lg" />
-          </div>
-
-          <div className="w-full text-center text-gray-600">
-            <p className="text-sm">OR</p>
-          </div>
-
-          <div className="w-full flex justify-center">
-            <button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={loading}
-              className="w-3/4 py-2 px-4 bg-white text-blue-500 border border-blue-500 rounded-lg shadow-md hover:bg-blue-50 hover:shadow-lg transition-all"
-            >
-              {loading ? "Signing in with Google..." : "Sign in with Google"}
-            </button>
-          </div>
-
-          <div className="text-center w-full">
-            <p className="text-sm text-gray-600">
-              <Link href="/forgot-password" className="text-blue-500 hover:underline">
-                Forgot Password?
-              </Link>
+      <div className="max-w-md w-full space-y-8">
+        <div className="bg-card rounded-3xl border border-border shadow-sm p-8 md:p-10 relative">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 mx-auto mb-6">
+              <img 
+                src="/icon.jpg" 
+                alt="CV Master AI Logo" 
+                className="w-full h-full rounded-full object-cover shadow-sm border border-border/50" 
+              />
+            </div>
+            <h2 className="text-3xl font-bold text-foreground">Welcome back</h2>
+            <p className="mt-3 text-muted-foreground">
+              Sign in to your account to continue
             </p>
           </div>
 
-          <div className="text-center w-full mt-4">
-            <p className="text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link href="/signup" className="text-blue-500 hover:underline">
-                Create one
-              </Link>
-            </p>
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-4">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-border/50 bg-background/50 focus:bg-background focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all duration-300 text-foreground shadow-sm hover:border-primary/30"
+                  placeholder="Email address"
+                />
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 rounded-xl border border-border/50 bg-background/50 focus:bg-background focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all duration-300 text-foreground shadow-sm hover:border-primary/30"
+                  placeholder="Password"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-primary focus:ring-primary border-border rounded bg-background"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-muted-foreground">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <Link href="/forgot-password" className="font-medium text-primary hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-4 rounded-full bg-primary text-primary-foreground font-medium shadow-md hover:bg-primary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-0.5"
+              >
+                {loading ? "Signing in..." : "Sign in"}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                className="w-full inline-flex justify-center items-center py-3 px-4 rounded-xl border border-border bg-background hover:bg-secondary text-sm font-medium text-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <svg className="h-5 w-5 mr-2" aria-hidden="true" viewBox="0 0 24 24">
+                  <path
+                    d="M12.0003 4.75C13.7703 4.75 15.3553 5.36002 16.6053 6.54998L20.0303 3.125C17.9502 1.19 15.2353 0 12.0003 0C7.31028 0 3.25527 2.69 1.28027 6.60998L5.27028 9.70498C6.21525 6.86002 8.87028 4.75 12.0003 4.75Z"
+                    fill="#EA4335"
+                  />
+                  <path
+                    d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.34 17.25 16.08 18.1L19.945 21.1C22.2 19.01 23.49 15.92 23.49 12.275Z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M5.26498 14.2949C5.02498 13.5699 4.88501 12.7999 4.88501 11.9999C4.88501 11.1999 5.01998 10.4299 5.26498 9.7049L1.275 6.60986C0.46 8.22986 0 10.0599 0 11.9999C0 13.9399 0.46 15.7699 1.28 17.3899L5.26498 14.2949Z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12.0004 24.0001C15.2404 24.0001 17.9654 22.935 19.9454 21.095L16.0804 18.095C15.0054 18.82 13.6204 19.245 12.0004 19.245C8.8704 19.245 6.21537 17.135 5.26538 14.29L1.27539 17.385C3.25539 21.31 7.3104 24.0001 12.0004 24.0001Z"
+                    fill="#34A853"
+                  />
+                </svg>
+                Continue with Google
+              </button>
+            </div>
           </div>
-        </form>
-      </motion.section>
-    </div>
+          
+          <div className="mt-8 text-center text-sm text-muted-foreground">
+            Don't have an account?{" "}
+            <Link href="/signup" className="font-medium text-primary hover:underline">
+              Sign up
+            </Link>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
-};
-
-export default SignIn;
+}

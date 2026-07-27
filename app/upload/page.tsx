@@ -1,142 +1,135 @@
 "use client";
 
-import type React from "react";
-import { useState } from "react";
-import { Upload, FileType, AlertCircle, Wand2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { Upload as UploadIcon, FileText, CheckCircle2, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-export default function UploadResume() {
-  const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export default function UploadPage() {
   const router = useRouter();
+  const [dragActive, setDragActive] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
-  const allowedFormats = [".tex", ".docx", ".md"];
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      const fileExtension = "." + selectedFile.name.split(".").pop()?.toLowerCase();
-      if (allowedFormats.includes(fileExtension)) {
-        setFile(selectedFile);
-        setError(null);
-      } else {
-        setFile(null);
-        setError("Please upload a .tex, .docx, or .md file.");
-      }
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
     }
   };
 
-  const handleUpload = async () => {
-    if (!file) return;
-    console.log("Uploading file:", file.name);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    router.push("/edit-resume");
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
   };
 
-  const handleEditWithAI = async () => {
-    if (!file) return;
-    console.log("Editing file with AI:", file.name);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    router.push("/ai-edit-resume");
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
+  const handleFile = (file: File) => {
+    if (file.type === "application/pdf") {
+      setFile(file);
+    } else {
+      alert("Please upload a PDF file.");
+    }
   };
 
   return (
     <motion.div
-      className="container mx-auto px-4 py-16 md:py-24"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background relative overflow-hidden"
     >
-      <div className="max-w-3xl mx-auto text-center space-y-6 mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          Upload or Edit Your Resume
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Upload your existing resume in LaTeX, DOCX, or MD format to get started
-        </p>
-      </div>
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
-      <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-        {/* Upload Resume Card */}
-        <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.3 }}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Upload Resume</CardTitle>
-              <CardDescription>Choose a .tex, .docx, or .md file to upload</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <Label htmlFor="resume" className="cursor-pointer">Resume File</Label>
-                <Input id="resume" type="file" accept=".tex,.docx,.md" onChange={handleFileChange} className="cursor-pointer" />
-                {error && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-                {file && !error && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                    <Alert>
-                      <FileType className="h-4 w-4" />
-                      <AlertTitle>File selected</AlertTitle>
-                      <AlertDescription>{file.name}</AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-                <Button onClick={handleUpload} disabled={!file || !!error} className="w-full cursor-pointer">
-                  <Upload className="mr-2 h-4 w-4" /> Upload Resume
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+      <div className="container mx-auto px-6 py-20 max-w-4xl">
+        <div className="text-center mb-12 space-y-6">
+          <span className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium shadow-sm">
+            Upload Existing
+          </span>
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground">
+            Upload Your Resume
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Upload your current PDF resume. We'll extract your data so you can apply our beautiful templates or use AI to enhance it.
+          </p>
+        </div>
 
-        {/* Edit with AI Card */}
-        <motion.div whileHover={{ scale: 1.03 }} transition={{ duration: 0.3 }}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Edit with AI</CardTitle>
-              <CardDescription>Upload your resume and let AI enhance it</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <Label htmlFor="ai-resume" className="cursor-pointer">Resume File</Label>
-                <Input id="ai-resume" type="file" accept=".tex,.docx,.md" onChange={handleFileChange} className="cursor-pointer" />
-                {error && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-                {file && !error && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-                    <Alert>
-                      <FileType className="h-4 w-4" />
-                      <AlertTitle>File selected</AlertTitle>
-                      <AlertDescription>{file.name}</AlertDescription>
-                    </Alert>
-                  </motion.div>
-                )}
-                <Button onClick={handleEditWithAI} disabled={!file || !!error} className="w-full cursor-pointer">
-                  <Wand2 className="mr-2 h-4 w-4" /> Edit with AI
-                </Button>
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Upload Area */}
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 flex flex-col items-center justify-center relative group/upload hover:shadow-lg transition-all duration-300">
+            <input
+              type="file"
+              id="resume-upload"
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              accept=".pdf"
+              onChange={handleChange}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
+            />
+            <div className={`w-full border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-colors duration-300 ${dragActive ? 'border-primary bg-primary/10' : 'border-border bg-background group-hover/upload:border-primary group-hover/upload:bg-primary/5'}`}>
+              <div className="w-14 h-14 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <UploadIcon className="w-7 h-7 text-primary" />
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+              <h3 className="text-xl font-bold text-foreground mb-2">Drag & Drop PDF</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                or click to browse your files
+              </p>
+              {file && (
+                <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-4 py-2 rounded-full font-medium">
+                  <CheckCircle2 className="w-4 h-4" />
+                  {file.name}
+                </div>
+              )}
+            </div>
+            
+            <button
+              onClick={() => router.push("/templates")}
+              disabled={!file}
+              className="w-full mt-6 py-3 px-4 rounded-full bg-primary text-primary-foreground font-medium shadow-md hover:bg-primary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:-translate-y-0.5"
+            >
+              Parse & Edit Manually
+            </button>
+          </div>
+
+          {/* AI Enhance Area */}
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 flex flex-col justify-between opacity-80 cursor-not-allowed relative">
+            <div className="absolute top-4 right-4">
+              <span className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold shadow-sm">
+                Coming Soon
+              </span>
+            </div>
+            <div className="text-center mt-4">
+              <div className="w-14 h-14 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Sparkles className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-3">AI Enhance</h3>
+              <p className="text-muted-foreground mb-8">
+                Let our advanced AI analyze your uploaded resume, fix grammatical errors, and optimize bullet points for ATS systems.
+              </p>
+            </div>
+            <button
+              disabled
+              className="w-full py-3 px-4 rounded-full bg-primary/50 text-primary-foreground font-medium cursor-not-allowed transition-all duration-300"
+            >
+              Coming Soon
+            </button>
+          </div>
+        </div>
       </div>
     </motion.div>
   );

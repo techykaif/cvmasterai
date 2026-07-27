@@ -8,10 +8,14 @@ import { Typewriter } from "react-simple-typewriter"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Navigation } from "swiper/modules"
 import { ArrowRight, Zap } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { MotionButton } from "./components/ui/MotionButton"
+import { InteractiveHoverButton } from "./components/ui/InteractiveHoverButton"
 import "swiper/css"
 import "swiper/css/navigation"
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div className="flex flex-col items-center justify-center w-full overflow-hidden">
       {/* Subtle Background Pattern */}
@@ -47,7 +51,7 @@ export default function Home() {
           Create, customize, and optimize your resume effortlessly using cutting-edge AI. Built for professionals who want to stand out.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button text="Start Building Free" href="/create" />
+          <InteractiveHoverButton text="Start Building Free" onClick={() => router.push("/create")} />
           <Button text="View Templates" href="/templates" variant="secondary" />
         </div>
       </motion.section>
@@ -149,7 +153,7 @@ export default function Home() {
         <p className="text-lg text-muted-foreground mb-8">
           Join thousands of job seekers who have already boosted their interview rates with our AI-powered resume builder.
         </p>
-        <Button text="Get Started for Free" href="/create" />
+        <MotionButton label="Get Started for Free" onClick={() => router.push("/create")} />
       </motion.section>
     </div>
   )

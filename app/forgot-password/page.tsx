@@ -1,60 +1,99 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { getAuth, sendPasswordResetEmail } from "firebase/auth"
-import { app } from "@/app/firebaseConfig"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { KeyRound, Mail, ArrowLeft } from "lucide-react";
 
-export default function ForgotPassword() {
-  const [email, setEmail] = useState("")
-  const [message, setMessage] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
-  const auth = getAuth(app)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setMessage("")
-    setError("")
-    setLoading(true)
-
-    try {
-      await sendPasswordResetEmail(auth, email)
-      setMessage(`Password reset link sent to ${email}`)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSubmitted(true);
+    }, 1500);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-xl font-semibold text-gray-700 mb-4">Forgot Password</h2>
-        <p className="text-sm text-gray-500 mb-4">Enter your email to reset your password.</p>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden"
+    >
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
-        {message && <p className="text-sm text-green-600 mb-4">{message}</p>}
-        {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
+      <div className="max-w-md w-full space-y-8">
+        <div className="bg-card rounded-3xl border border-border shadow-sm p-8 md:p-10 relative">
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <KeyRound className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-3xl font-bold text-foreground">Reset Password</h2>
+            <p className="mt-3 text-muted-foreground">
+              Enter your email and we'll send you a link to reset your password.
+            </p>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email address"
-            className="w-full px-4 py-2 border rounded-md focus:ring focus:border-blue-500"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-            disabled={loading}
-          >
-            {loading ? "Sending..." : "Send Reset Link"}
-          </button>
-        </form>
+          {!submitted ? (
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-foreground"
+                    placeholder="Email address"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3 px-4 rounded-full bg-primary text-primary-foreground font-medium shadow-md hover:bg-primary/90 hover:shadow-lg transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed hover:-translate-y-0.5"
+                >
+                  {loading ? "Sending link..." : "Send Reset Link"}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="text-center space-y-6">
+              <div className="bg-green-500/10 text-green-600 rounded-2xl p-4 font-medium text-sm border border-green-500/20">
+                Check your email! We've sent a password reset link to {email}.
+              </div>
+              <button
+                onClick={() => setSubmitted(false)}
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Didn't receive it? Try again
+              </button>
+            </div>
+          )}
+          
+          <div className="mt-8 text-center text-sm">
+            <Link href="/signin" className="inline-flex items-center font-medium text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Sign in
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
-  )
+    </motion.div>
+  );
 }

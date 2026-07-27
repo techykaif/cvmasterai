@@ -39,11 +39,11 @@ export function Button({
   // Define default styles for variants
   const variantClasses = {
     primary: disabled
-      ? "bg-blue-300 text-white cursor-not-allowed opacity-50"
-      : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-lg",
+      ? "bg-primary/50 text-primary-foreground cursor-not-allowed opacity-50 shadow-none"
+      : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25 hover:shadow-primary/40 border border-transparent hover:-translate-y-0.5",
     secondary: disabled
-      ? "bg-gray-300 text-gray-500 cursor-not-allowed opacity-50"
-      : "bg-gray-200 text-gray-800 border border-gray-400 hover:bg-gray-300 shadow-md",
+      ? "bg-secondary/50 text-muted-foreground cursor-not-allowed opacity-50"
+      : "bg-secondary text-secondary-foreground border border-border hover:bg-secondary/80 shadow-sm hover:shadow-md",
     custom: disabled ? "cursor-not-allowed opacity-50" : "",
   };
 

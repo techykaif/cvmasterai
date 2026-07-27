@@ -1,107 +1,94 @@
 "use client";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { FileText, Palette, Sparkles } from "lucide-react";
+
 import { motion } from "framer-motion";
+import { FileText, Sparkles, Upload } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-export default function CreateResume() {
+export default function CreatePage() {
   const router = useRouter();
 
   return (
-    <div className="container mx-auto px-4 py-16 md:py-24">
-      <div className="max-w-3xl mx-auto text-center space-y-6">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-          Create Your Resume
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Choose how you want to create your professional resume and stand out from the crowd
-        </p>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background relative overflow-hidden"
+    >
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+
+      <div className="container mx-auto px-6 py-20 max-w-5xl">
+        <div className="text-center mb-16 space-y-6">
+          <span className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium shadow-sm">
+            Resume Builder
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+            How would you like to start?
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Choose your preferred method to build a stunning, professional resume.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Option 1: Start from Scratch */}
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 text-center hover:shadow-lg hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 group flex flex-col h-full">
+            <div className="w-14 h-14 mx-auto mb-6 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-sm group-hover:bg-primary transition-colors duration-500">
+              <FileText className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-3">Start from Scratch</h3>
+            <p className="text-muted-foreground mb-8 flex-grow">
+              Build your resume step-by-step with our easy-to-use editor. Perfect if you are starting fresh.
+            </p>
+            <button
+              onClick={() => router.push("/templates")}
+              className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300"
+            >
+              Browse Templates
+            </button>
+          </div>
+
+          {/* Option 2: Upload Existing */}
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 text-center hover:shadow-lg hover:-translate-y-1 hover:border-primary/50 transition-all duration-300 group flex flex-col h-full">
+            <div className="w-14 h-14 mx-auto mb-6 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-sm group-hover:bg-primary transition-colors duration-500">
+              <Upload className="w-7 h-7 text-primary group-hover:text-primary-foreground transition-colors" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-3">Upload Resume</h3>
+            <p className="text-muted-foreground mb-8 flex-grow">
+              Already have a resume? Upload your PDF and we'll extract the data into our beautiful templates.
+            </p>
+            <button
+              onClick={() => router.push("/upload")}
+              className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300"
+            >
+              Upload PDF
+            </button>
+          </div>
+
+          {/* Option 3: AI Generate (Coming Soon) */}
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 text-center transition-all duration-300 relative overflow-hidden flex flex-col h-full opacity-80 cursor-not-allowed">
+            <div className="absolute top-4 right-4">
+              <span className="inline-flex px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold shadow-sm">
+                Coming Soon
+              </span>
+            </div>
+            <div className="w-14 h-14 mx-auto mb-6 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-sm">
+              <Sparkles className="w-7 h-7 text-primary" />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground mb-3">AI Generate</h3>
+            <p className="text-muted-foreground mb-8 flex-grow">
+              Just paste your LinkedIn profile URL or write a short prompt, and our AI will build it for you.
+            </p>
+            <button
+              disabled
+              className="w-full py-3 px-4 rounded-full bg-primary/50 text-primary-foreground relative z-20 border-0 font-medium cursor-not-allowed transition-all"
+            >
+              Coming Soon
+            </button>
+          </div>
+        </div>
       </div>
-
-      <motion.div 
-        className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut", staggerChildren: 0.2 }}
-      >
-        {/* Custom Resume Card */}
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Card className="relative group hover:shadow-lg transition-shadow">
-            <Link href="/create/custom" className="absolute inset-0">
-              <span className="sr-only">Create custom resume</span>
-            </Link>
-            <CardHeader className="text-center pb-4">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <Palette className="w-6 h-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Create Custom</CardTitle>
-              <CardDescription>Design your resume from scratch</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-sm text-muted-foreground space-y-2 mb-6">
-                <li>Start with a blank canvas</li>
-                <li>Full customization options</li>
-                <li>AI-powered content suggestions</li>
-                <li>Real-time preview</li>
-              </ul>
-              <Button className="w-full" variant="outline">
-                Start Fresh
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* Templates Card */}
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Card className="relative group hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <FileText className="w-6 h-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">Use Template</CardTitle>
-              <CardDescription>Choose from professional templates</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-sm text-muted-foreground space-y-2 mb-6">
-                <li>Professional designs</li>
-                <li>Industry-specific templates</li>
-                <li>Easy customization</li>
-                <li>ATS-friendly formats</li>
-              </ul>
-              <Button className="w-full" variant="outline" onClick={() => router.push("/templates")}>
-                Browse Templates
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* AI-Powered Resume Card */}
-        <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.2 }}>
-          <Card className="relative group hover:shadow-lg transition-shadow">
-            <CardHeader className="text-center pb-4">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl">AI-Powered Resume</CardTitle>
-              <CardDescription>Let AI build your resume in seconds</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <ul className="text-sm text-muted-foreground space-y-2 mb-6">
-                <li>Smart AI suggestions</li>
-                <li>Optimized for your industry</li>
-                <li>Instant resume creation</li>
-                <li>Customizable sections</li>
-              </ul>
-              <Button className="w-full" variant="outline" onClick={() => router.push("/create/ai")}>
-                Generate with AI
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </motion.div>
-    </div>
+    </motion.div>
   );
 }

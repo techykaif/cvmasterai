@@ -1,48 +1,85 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
+import { Lightbulb, Shield, Zap, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { InteractiveHoverButton } from "../components/ui/InteractiveHoverButton";
 
-export default function About() {
+export default function AboutPage() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-br from-blue-50 to-purple-100"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background relative overflow-hidden"
     >
-      <motion.h1
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-500 drop-shadow-lg mb-6"
-      >
-        About Us
-      </motion.h1>
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.4 }}
-        className="text-xl text-gray-700 max-w-3xl text-center mb-8 leading-relaxed"
-      >
-        Our AI-powered resume builder helps job seekers create, optimize, and enhance resumes effortlessly. 
-        Whether you're starting from scratch or refining your existing resume, our AI-driven features 
-        ensure that you stand out in the job market.
-      </motion.p>
+      <div className="container mx-auto px-6 py-16 max-w-5xl">
+        {/* Hero Section */}
+        <div className="text-center mb-16 space-y-6">
+          <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            About Us
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground">
+            Empowering Your Career Journey
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+            We believe everyone deserves a resume that truly reflects their potential. Our platform makes professional resume creation effortless and accessible.
+          </p>
+        </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.6 }}
-      >
-        <Link
-          href="/"
-          className="text-lg font-semibold text-white bg-blue-600 px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105"
-        >
-          ← Back to Home
-        </Link>
-      </motion.div>
+        {/* Mission Section */}
+        <div className="bg-card rounded-3xl border border-border shadow-sm p-8 md:p-12 mb-16 text-center hover:shadow-lg hover:border-primary/50 transition-all duration-500">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Our Mission</h2>
+          <p className="text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
+            To level the playing field in the job market by providing intelligent, intuitive tools that help job seekers stand out to employers and land their dream roles.
+          </p>
+        </div>
+
+        {/* Values Grid */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 hover:shadow-lg hover:-translate-y-1 hover:border-primary/50 transition-all duration-500 group">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-500">
+              <Lightbulb className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-3">Innovation</h3>
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              We leverage cutting-edge technology to analyze industry trends and help generate highly effective resume content.
+            </p>
+          </div>
+
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 hover:shadow-lg hover:-translate-y-1 hover:border-primary/50 transition-all duration-500 group">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-500">
+              <Shield className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-3">Privacy</h3>
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              Your data belongs to you. We maintain strict security protocols to ensure your personal information remains confidential.
+            </p>
+          </div>
+
+          <div className="bg-card rounded-3xl border border-border shadow-sm p-8 hover:shadow-lg hover:-translate-y-1 hover:border-primary/50 transition-all duration-500 group">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary transition-colors duration-500">
+              <Zap className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-3">Simplicity</h3>
+            <p className="text-muted-foreground leading-relaxed text-sm">
+              We've stripped away the complexity. Our clean, intuitive interface lets you focus on what matters: your accomplishments.
+            </p>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mb-8 flex justify-center">
+          <InteractiveHoverButton 
+            text="Build Your Resume" 
+            onClick={() => window.location.href = "/create"}
+          />
+        </div>
+      </div>
     </motion.div>
-  )
+  );
 }

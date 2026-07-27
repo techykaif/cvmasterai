@@ -1,98 +1,130 @@
 "use client";
-import { useEffect, useState } from "react";
-import { Mail } from "lucide-react";
+
 import { motion } from "framer-motion";
+import { Mail, MapPin, Phone, Send } from "lucide-react";
+import { useState } from "react";
+import { InteractiveHoverButton } from "../components/ui/InteractiveHoverButton";
 
 export default function ContactPage() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert("Message sent successfully!");
+    }, 1500);
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 40 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      className="container mx-auto px-6 py-12 max-w-3xl"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen bg-background relative overflow-hidden"
     >
-      {/* Hero Section */}
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-900">Contact Us</h1>
-        <p className="text-gray-600 mt-2 text-lg">
-          Have a question? Fill out the form below or email us at
-        </p>
-        <a
-          href="mailto:support@cvmasterai.com"
-          className="inline-flex items-center mt-3 text-blue-600 hover:underline"
-        >
-          <Mail className="w-5 h-5 mr-2" /> support@cvmasterai.com
-        </a>
+      {/* Subtle Background Pattern */}
+      <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+
+      <div className="container mx-auto px-6 py-16 max-w-5xl">
+        <div className="text-center mb-16 space-y-6">
+          <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+            Get in Touch
+          </div>
+          <h1 className="text-3xl md:text-5xl font-bold text-foreground">
+            We'd Love to Hear From You
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-lg leading-relaxed">
+            Have a question about our resume builder or need help with your account? Our team is here to support your career journey.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-5 gap-12">
+          {/* Contact Info (2 columns) */}
+          <div className="md:col-span-2 space-y-8">
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-8 hover:shadow-lg hover:border-primary/50 transition-all duration-300 group">
+              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary transition-colors duration-500">
+                <Mail className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-1">Email Us</h3>
+              <p className="text-muted-foreground mb-3 text-sm">Our friendly team is here to help.</p>
+              <a href="mailto:support@cvmasterai.com" className="text-primary font-medium hover:underline">
+                support@cvmasterai.com
+              </a>
+            </div>
+
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-8 hover:shadow-lg hover:border-primary/50 transition-all duration-300 group">
+              <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-primary transition-colors duration-500">
+                <MapPin className="w-6 h-6 text-primary group-hover:text-primary-foreground transition-colors" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground mb-1">Visit Us</h3>
+              <p className="text-muted-foreground mb-3 text-sm">Come say hello at our office HQ.</p>
+              <p className="text-foreground font-medium">
+                100 Innovation Way<br />
+                San Francisco, CA 94105
+              </p>
+            </div>
+          </div>
+
+          {/* Contact Form (3 columns) */}
+          <div className="md:col-span-3">
+            <div className="bg-card rounded-3xl border border-border shadow-sm p-8 md:p-10">
+              <h2 className="text-2xl font-bold text-foreground mb-6">Send us a Message</h2>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">First Name</label>
+                    <input 
+                      type="text" 
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-foreground"
+                      placeholder="Jane"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Last Name</label>
+                    <input 
+                      type="text" 
+                      className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-foreground"
+                      placeholder="Doe"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Email</label>
+                  <input 
+                    type="email" 
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-foreground"
+                    placeholder="jane@example.com"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Message</label>
+                  <textarea 
+                    rows={5}
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-foreground resize-none"
+                    placeholder="How can we help you?"
+                    required
+                  ></textarea>
+                </div>
+
+                <InteractiveHoverButton
+                  type="submit"
+                  disabled={isSubmitting}
+                  text={isSubmitting ? "Sending..." : "Send Message"}
+                  className="w-full"
+                />
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* Contact Form */}
-      <motion.form
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
-        className="bg-white p-6 md:p-8 rounded-xl shadow-2xl transform transition-all duration-300 hover:shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
-      >
-        {/* Name Field */}
-        <div className="mb-4">
-          <label htmlFor="name" className="block text-gray-700 font-medium">
-            Name
-          </label>
-          <motion.input
-            whileFocus={{ scale: 1.02, borderColor: "#2563eb" }}
-            type="text"
-            id="name"
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-1 focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-            placeholder="Enter your name"
-          />
-        </div>
-
-        {/* Email Field */}
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 font-medium">
-            Email
-          </label>
-          <motion.input
-            whileFocus={{ scale: 1.02, borderColor: "#2563eb" }}
-            type="email"
-            id="email"
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-1 focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-            placeholder="Enter your email"
-          />
-        </div>
-
-        {/* Message Field */}
-        <div className="mb-4">
-          <label htmlFor="message" className="block text-gray-700 font-medium">
-            Message
-          </label>
-          <motion.textarea
-            whileFocus={{ scale: 1.02, borderColor: "#2563eb" }}
-            id="message"
-            required
-            rows={4}
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 mt-1 focus:border-blue-500 focus:ring focus:ring-blue-200 transition resize-none"
-            placeholder="Your message"
-          ></motion.textarea>
-        </div>
-
-        {/* Submit Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="submit"
-          className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-semibold shadow-md hover:shadow-lg"
-        >
-          Send Message
-        </motion.button>
-      </motion.form>
     </motion.div>
   );
 }

@@ -8,6 +8,7 @@ import { Menu, X, ChevronDown } from "lucide-react"
 import { getAuth, signOut, onAuthStateChanged } from "firebase/auth"
 import { app } from "@/app/firebaseConfig"
 import { Button } from "@/app/components/Button"
+import { MotionButton } from "@/app/components/ui/MotionButton"
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -66,7 +67,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto flex justify-between items-center h-12">
         <Link href="/" className="flex items-center gap-3 group">
           <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }}>
-            <img src="/icon.jpg" alt="CV Master AI Logo" className="w-9 h-9 rounded-xl shadow-sm border border-border/50 group-hover:shadow-indigo-500/25 transition-all duration-300" />
+            <img src="/icon.jpg" alt="CV Master AI Logo" className="w-9 h-9 rounded-full shadow-sm border border-border/50 group-hover:shadow-indigo-500/25 transition-all duration-300 object-cover" />
           </motion.div>
           <motion.span initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="text-xl font-bold text-foreground">
             CV Master<span className="text-indigo-600">AI</span>
@@ -117,7 +118,7 @@ export default function Header() {
                   <Button text="Sign In" href="/signin" variant="custom" customStyles={{ backgroundColor: "transparent", textColor: "text-muted-foreground", hoverTextColor: "hover:text-foreground" }} size="small" />
                 </li>
                 <li>
-                  <Button text="Get Started" href="/signup" size="small" />
+                  <MotionButton label="Get Started" onClick={() => router.push("/signup")} className="px-4 py-2 text-sm" />
                 </li>
               </>
             )}

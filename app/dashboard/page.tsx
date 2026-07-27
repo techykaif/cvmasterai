@@ -2,8 +2,13 @@
 
 import { FileText, LayoutTemplate, Wand2, Eye, PlusCircle, Layout, UploadCloud } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { MotionButton } from "../components/ui/MotionButton"
+import { DownloadButton } from "../components/ui/DownloadButton"
+import { SaveButton } from "../components/ui/SaveButton"
 
 export default function DashboardPage() {
+  const router = useRouter();
   const stats = [
     { label: "Resumes Created", value: "3", icon: FileText },
     { label: "Templates Used", value: "2", icon: LayoutTemplate },
@@ -69,12 +74,11 @@ export default function DashboardPage() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">{action.title}</h3>
               <p className="text-muted-foreground text-sm mb-6 flex-grow leading-relaxed">{action.description}</p>
-              <Link 
-                href={action.href}
-                className="inline-flex items-center justify-center w-full py-3 px-4 bg-secondary hover:bg-primary text-secondary-foreground hover:text-primary-foreground font-medium rounded-full transition-all duration-300 text-sm"
-              >
-                Get Started
-              </Link>
+              <MotionButton 
+                label="Get Started" 
+                onClick={() => router.push(action.href)} 
+                className="w-full text-sm py-3" 
+              />
             </div>
           ))}
         </div>
@@ -83,12 +87,23 @@ export default function DashboardPage() {
       {/* Recent Activity */}
       <div className="pb-12">
         <h2 className="text-xl font-semibold text-foreground mb-4">Recent Activity</h2>
-        <div className="bg-card/30 backdrop-blur-md rounded-3xl border border-border border-dashed shadow-sm p-12 text-center transition-all duration-300 hover:border-primary/50 hover:bg-card/50">
-          <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4 border border-border">
-            <FileText className="w-8 h-8 text-muted-foreground" />
+        <div className="bg-card/30 backdrop-blur-md rounded-3xl border border-border shadow-sm p-8 transition-all duration-300 hover:border-primary/50 hover:bg-card/50">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center border border-border">
+                <FileText className="w-8 h-8 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-foreground mb-1">Software Engineer Resume</h3>
+                <p className="text-muted-foreground text-sm">Last edited 2 hours ago</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <SaveButton />
+              <DownloadButton />
+            </div>
           </div>
-          <h3 className="text-lg font-medium text-foreground mb-1">No recent activity yet</h3>
-          <p className="text-muted-foreground">Create your first resume to get started!</p>
         </div>
       </div>
     </div>
