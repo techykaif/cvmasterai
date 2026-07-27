@@ -42,10 +42,10 @@ export default function CreatePage() {
               Build your resume step-by-step with our easy-to-use editor. Perfect if you are starting fresh.
             </p>
             <button
-              onClick={() => router.push("/templates")}
+              onClick={() => router.push("/custom")}
               className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300"
             >
-              Browse Templates
+              Create Custom
             </button>
           </div>
 
