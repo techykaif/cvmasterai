@@ -1,58 +1,70 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FileText, Sparkles, Upload } from "lucide-react";
+import { FileText, Sparkles, Upload, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { auth, db } from "../firebaseConfig";
+import { useState } from "react";
+import { auth, db } from "@/app/firebaseConfig";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
 
 export default function CreatePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
-
-  useEffect(() => {
-    if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setIsAuth(!!user);
-    });
-    return () => unsubscribe();
-  }, []);
+  const [error, setError] = useState<string | null>(null);
 
   const handleCreateScratch = async () => {
-    if (!isAuth || !auth?.currentUser) {
+    setError(null);
+    console.log("[Create Flow] Started");
+
+    if (!auth?.currentUser) {
+      console.log("[Create Flow] auth.currentUser is null, redirecting...");
       router.push("/signin?redirected=true");
       return;
     }
+
+    console.log("[Create Flow] Auth user present:", auth.currentUser.uid);
     setLoading(true);
+
     try {
       const user = auth.currentUser;
-      const docRef = await addDoc(collection(db, "users", user.uid, "resumes"), {
+      const collectionRef = collection(db, "users", user.uid, "resumes");
+      console.log("[Create Flow] About to create Firestore document in:", collectionRef.path);
+
+      const payload = {
         templateId: "minimal-impact",
         name: "Untitled Resume",
         updatedAt: serverTimestamp(),
         personal: {
-          name: "",
-          title: "",
-          email: "",
-          phone: "",
-          website: "",
-          address: "",
-          summary: ""
+          name: "", title: "", email: "", phone: "", website: "", address: "", summary: ""
         },
         experience: [],
         education: [],
         skills: ""
-      });
-      router.push(`/editor/minimal-impact?resumeId=${docRef.id}`);
-    } catch (err) {
-      console.error("Error creating resume:", err);
-      alert("Failed to create resume.");
+      };
+
+      const addDocPromise = addDoc(collectionRef, payload);
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("addDoc timeout: Firebase operation hung for 10s")), 10000)
+      );
+
+      const docRef = await Promise.race([addDocPromise, timeoutPromise]) as any;
+      console.log("[Create Flow] Firestore document created successfully. resumeId:", docRef.id);
+
+      const targetUrl = `/editor/minimal-impact?resumeId=${docRef.id}`;
+      console.log("[Create Flow] About to navigate to:", targetUrl);
+      router.push(targetUrl);
+      console.log("[Create Flow] Navigation triggered.");
+
+    } catch (err: any) {
+      console.error("[Create Flow] Error creating resume:", err);
+      const errorMessage = err?.message || "Failed to create resume.";
+      setError(`Unable to create your resume: ${errorMessage}`);
       setLoading(false);
     }
+    // We do NOT use finally { setLoading(false) } here because router.push is asynchronous
+    // and does not return a Promise. If we reset loading to false here, the button will
+    // re-enable BEFORE the page navigates, allowing duplicate clicks and creating a stale UI state.
   };
 
   return (
@@ -91,10 +103,22 @@ export default function CreatePage() {
             <button
               onClick={handleCreateScratch}
               disabled={loading}
-              className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300 disabled:opacity-50"
+              className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {loading ? "Creating..." : "Create Custom"}
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Custom"
+              )}
             </button>
+            {error && (
+              <p className="mt-3 text-sm text-red-500 font-medium">
+                {error}
+              </p>
+            )}
           </div>
 
           {/* Option 2: Upload Existing */}

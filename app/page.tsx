@@ -22,11 +22,8 @@ export default function Home() {
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
       {/* Hero Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="w-full max-w-5xl text-center mt-12 mb-16 px-6"
+      <section
+        className="w-full max-w-5xl text-center mt-12 mb-16 px-6 animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out"
       >
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
           <Zap className="w-3.5 h-3.5" />
@@ -54,7 +51,7 @@ export default function Home() {
           <InteractiveHoverButton text="Start Building Free" onClick={() => router.push("/create")} />
           <Button text="View Templates" href="/templates" variant="secondary" />
         </div>
-      </motion.section>
+      </section>
 
       {/* How It Works Section */}
       <motion.section

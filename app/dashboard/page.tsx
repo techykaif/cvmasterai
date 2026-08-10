@@ -5,7 +5,7 @@ import { FileText, LayoutTemplate, PlusCircle, Layout, UploadCloud, Trash2, Edit
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { getAuth, onAuthStateChanged, User } from "firebase/auth"
+import { getAuth, User } from "firebase/auth"
 import { collection, query, getDocs, orderBy, deleteDoc, doc } from "firebase/firestore"
 import { auth, db } from "@/app/firebaseConfig"
 import { MotionButton } from "../components/ui/MotionButton"
@@ -24,21 +24,15 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [resumes, setResumes] = useState<SavedResume[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!auth) {
+    if (auth?.currentUser) {
+      setUser(auth.currentUser);
+      fetchResumes(auth.currentUser.uid);
+    } else {
       router.push("/signin");
-      return;
     }
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        await fetchResumes(currentUser.uid);
-      } else {
-        router.push("/signin");
-      }
-    });
-    return () => unsubscribe();
   }, [router]);
 
   const fetchResumes = async (userId: string) => {
@@ -60,11 +54,15 @@ export default function DashboardPage() {
 
   const handleDelete = async (resumeId: string) => {
     if (!user || !confirm("Are you sure you want to delete this resume?")) return;
+    setDeletingId(resumeId);
     try {
       await deleteDoc(doc(db, "users", user.uid, "resumes", resumeId));
       setResumes(prev => prev.filter(r => r.id !== resumeId));
     } catch (error) {
       console.error("Error deleting resume: ", error);
+      alert("Failed to delete resume. Please try again.");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -219,9 +217,15 @@ export default function DashboardPage() {
                         </button>
                         <button 
                           onClick={() => handleDelete(resume.id)}
-                          className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-sm font-medium hover:bg-red-500 hover:text-white transition-colors"
+                          disabled={deletingId === resume.id}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-xl text-sm font-medium hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          <Trash2 className="w-4 h-4" /> Delete
+                          {deletingId === resume.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
+                          {deletingId === resume.id ? "Deleting..." : "Delete"}
                         </button>
                       </div>
                     </motion.div>

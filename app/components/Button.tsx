@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Loader2 } from "lucide-react";
 
 interface ButtonProps {
   text: string;
@@ -8,7 +9,8 @@ interface ButtonProps {
   size?: "small" | "medium" | "large";
   type?: "button" | "submit" | "reset";
   className?: string;
-  disabled?: boolean; // Add disabled prop
+  disabled?: boolean;
+  isLoading?: boolean;
   customStyles?: {
     backgroundColor?: string;
     textColor?: string;
@@ -30,7 +32,8 @@ export function Button({
   size = "medium",
   type = "button",
   className = "",
-  disabled = false, // Default to false
+  disabled = false,
+  isLoading = false,
   customStyles = {},
 }: ButtonProps) {
   const baseClasses =
@@ -69,10 +72,14 @@ export function Button({
 
   const classes = `${customClasses} ${sizeClasses[size]} ${className} ${hoverClasses}`;
 
-  // Disable href-based links by rendering a <span> instead
+  const isButtonDisabled = disabled || isLoading;
+
   if (href) {
-    return disabled ? (
-      <span className={`${classes} cursor-not-allowed opacity-50`}>{text}</span>
+    return isButtonDisabled ? (
+      <span className={`${classes} cursor-not-allowed opacity-50 flex items-center justify-center gap-2`}>
+        {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+        {text}
+      </span>
     ) : (
       <Link href={href} className={classes}>
         {text}
@@ -81,7 +88,8 @@ export function Button({
   }
 
   return (
-    <button type={type} onClick={disabled ? undefined : onClick} className={classes} disabled={disabled}>
+    <button type={type} onClick={isButtonDisabled ? undefined : onClick} className={`${classes} flex items-center justify-center gap-2`} disabled={isButtonDisabled}>
+      {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
       {text}
     </button>
   );

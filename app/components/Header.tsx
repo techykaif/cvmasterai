@@ -56,9 +56,8 @@ export default function Header() {
     }
   }
 
-  if (!isAuthChecked) {
-    return <Loader />
-  }
+  // Remove the blocking loader so the page content renders immediately.
+  // We will show a subtle loading state in the navbar itself.
 
   return (
     <motion.header
@@ -84,7 +83,11 @@ export default function Header() {
             
             <li className="w-px h-5 bg-border mx-2" />
 
-            {user ? (
+            {!isAuthChecked ? (
+              <li className="pl-2 pr-1 flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              </li>
+            ) : user ? (
               <li className="relative pl-1">
                 <div className="flex items-center space-x-2 cursor-pointer px-3 py-1.5 rounded-full hover:bg-secondary transition-colors" onClick={toggleDropdown}>
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-semibold shadow-sm">
@@ -221,14 +224,4 @@ function MobileNavLink({ href, children }: { href: string; children: React.React
   )
 }
 
-function Loader() {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 flex justify-center items-center bg-background/80 backdrop-blur-lg z-50"
-    >
-      <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-    </motion.div>
-  )
-}
+// Loader removed to avoid blocking public pages.

@@ -10,7 +10,6 @@ import Link from "next/link";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/app/firebaseConfig";
-import { onAuthStateChanged } from "firebase/auth";
 import { Button } from "@/app/components/Button";
 import TemplateRenderer from "./TemplateRenderer";
 
@@ -40,7 +39,7 @@ export default function EditorPage() {
   const [currentTemplateId, setCurrentTemplateId] = useState(urlTemplateId);
   const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [exportingPDF, setExportingPDF] = useState(false);
   const [exportingDOCX, setExportingDOCX] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,12 +107,8 @@ export default function EditorPage() {
   };
 
   useEffect(() => {
-    if (!auth) {
-      router.push("/signin?redirected=true");
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const fetchResume = async () => {
+      const user = auth?.currentUser;
       if (!user) {
         router.push("/signin?redirected=true");
         return;
@@ -146,15 +141,15 @@ export default function EditorPage() {
       } finally {
         setLoading(false);
       }
-    });
+    };
 
-    return () => unsubscribe();
+    fetchResume();
   }, [resumeId, router]);
 
   const handleSave = async () => {
     if (!auth?.currentUser || !resumeId) return;
 
-    setSaving(true);
+    setSaveStatus("saving");
     try {
       const docRef = doc(db, "users", auth.currentUser.uid, "resumes", resumeId);
       await updateDoc(docRef, {
@@ -166,11 +161,14 @@ export default function EditorPage() {
         updatedAt: serverTimestamp(),
         name: personal.name ? `${personal.name}'s Resume` : "Untitled Resume"
       });
+      setSaveStatus("saved");
+      setTimeout(() => {
+        setSaveStatus(status => status === "saved" ? "idle" : status);
+      }, 3000);
     } catch (err) {
       console.error("Error saving resume:", err);
       alert("Failed to save resume. Please try again.");
-    } finally {
-      setSaving(false);
+      setSaveStatus("idle");
     }
   };
 
@@ -269,15 +267,19 @@ export default function EditorPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium transition-colors border border-border disabled:opacity-50"
+            disabled={saveStatus === "saving"}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors border ${saveStatus === "saved" ? "bg-green-500/10 text-green-600 border-green-500/20" : "bg-secondary hover:bg-secondary/80 text-foreground border-border"} disabled:opacity-50`}
           >
-            {saving ? (
+            {saveStatus === "saving" ? (
               <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+            ) : saveStatus === "saved" ? (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
             ) : (
               <Save className="w-4 h-4 text-muted-foreground" />
             )}
-            {saving ? "Saving..." : "Save"}
+            {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "Saved" : "Save"}
           </button>
           <button
             onClick={handleExportDOCX}
