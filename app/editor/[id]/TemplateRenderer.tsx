@@ -24,7 +24,7 @@ const ModernProfessional = ({ personal, experience, education, skills }: Templat
         {personal.website && <span>{personal.website}</span>}
       </div>
     </div>
-    
+
     <div className="px-14 py-10 space-y-8">
       {personal.summary && (
         <section>
@@ -32,7 +32,7 @@ const ModernProfessional = ({ personal, experience, education, skills }: Templat
           <p className="text-sm text-gray-700 leading-relaxed text-justify">{personal.summary}</p>
         </section>
       )}
-      
+
       {experience.length > 0 && (
         <section>
           <h2 className="text-xl font-bold text-slate-900 border-b-2 border-slate-900 mb-5 pb-2 uppercase tracking-wider">Experience</h2>
@@ -94,7 +94,7 @@ const CreativeEdge = ({ personal, experience, education, skills }: TemplateProps
       <div className="w-32 h-32 bg-teal-700 rounded-full mb-8 self-center border-4 border-teal-500 flex items-center justify-center text-4xl font-bold text-teal-300 uppercase">
         {personal.name ? personal.name.charAt(0) : "N"}
       </div>
-      
+
       <section className="mb-8">
         <h2 className="text-xs font-bold text-teal-300 uppercase tracking-widest mb-4 border-b border-teal-600 pb-2">Contact</h2>
         <div className="space-y-3 text-sm">
@@ -147,7 +147,7 @@ const CreativeEdge = ({ personal, experience, education, skills }: TemplateProps
           <p className="text-sm text-gray-600 leading-relaxed font-medium text-justify">{personal.summary}</p>
         </section>
       )}
-      
+
       {experience.length > 0 && (
         <section>
           <h2 className="text-xl font-extrabold text-gray-900 mb-6 flex items-center gap-3">
@@ -193,7 +193,7 @@ const MinimalStandard = ({ personal, experience, education, skills }: TemplatePr
         {personal.website && <span className="text-indigo-600">{personal.website}</span>}
       </div>
     </div>
-    
+
     <div className="px-14 py-8 space-y-7">
       {personal.summary && (
         <section>
@@ -203,7 +203,7 @@ const MinimalStandard = ({ personal, experience, education, skills }: TemplatePr
           </p>
         </section>
       )}
-      
+
       {experience.length > 0 && (
         <section>
           <h2 className="text-sm font-bold text-gray-800 border-b-2 border-gray-200 mb-4 pb-1.5 uppercase tracking-[0.2em]">Experience</h2>
@@ -259,16 +259,32 @@ const MinimalStandard = ({ personal, experience, education, skills }: TemplatePr
 );
 
 
+// --- TEMPLATE REGISTRY ---
+const templateRegistry: Record<string, React.ComponentType<TemplateProps>> = {
+  "creative-edge-1": CreativeEdge,
+  "creative-edge-2": CreativeEdge,
+  "creative-edge-3": CreativeEdge,
+  "creative-edge-4": CreativeEdge,
+  "creative-edge-5": CreativeEdge,
+  "creative-edge-6": CreativeEdge,
+  "creative-edge-7": CreativeEdge,
+  "creative-edge-8": CreativeEdge,
+  "creative-edge-9": CreativeEdge,
+  "creative-edge-10": CreativeEdge,
+  "creative-edge-11": CreativeEdge,
+  "creative-edge-12": CreativeEdge,
+  "creative-edge-13": CreativeEdge,
+  "creative-edge-14": CreativeEdge,
+  "executive-pro": ModernProfessional,
+  "minimal-impact": MinimalStandard,
+  "academic-excellence": MinimalStandard,
+  "modern-professional": ModernProfessional,
+  "tech-innovator": MinimalStandard,
+};
+
 export default function TemplateRenderer({ templateId, ...props }: TemplateProps & { templateId: string }) {
-  // Map template IDs to the specific design
-  if (templateId === "modern-professional" || templateId === "executive-pro") {
-    return <ModernProfessional {...props} />;
-  }
-  
-  if (templateId.includes("creative")) {
-    return <CreativeEdge {...props} />;
-  }
-  
-  // Default fallback (Minimal, Academic, Tech Innovator, etc)
-  return <MinimalStandard {...props} />;
+  // Deterministic template selection with a safe fallback
+  const TemplateComponent = templateRegistry[templateId] || templateRegistry["minimal-impact"];
+
+  return <TemplateComponent {...props} />;
 }

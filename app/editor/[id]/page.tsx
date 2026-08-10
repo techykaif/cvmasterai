@@ -31,9 +31,10 @@ export default function EditorPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const templateId = params.id as string;
+  const urlTemplateId = params.id as string;
   const resumeId = searchParams.get("resumeId");
 
+  const [currentTemplateId, setCurrentTemplateId] = useState(urlTemplateId);
   const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -125,6 +126,8 @@ export default function EditorPage() {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
+          if (data.templateId) setCurrentTemplateId(data.templateId);
+
           if (data.personal) setPersonal(data.personal);
           if (data.experience) setExperience(data.experience);
           if (data.education) setEducation(data.education);
@@ -154,6 +157,7 @@ export default function EditorPage() {
         experience,
         education,
         skills,
+        templateId: currentTemplateId,
         updatedAt: serverTimestamp(),
         name: personal.name ? `${personal.name}'s Resume` : "Untitled Resume"
       });
@@ -202,7 +206,7 @@ export default function EditorPage() {
           <div className="h-6 w-px bg-border mx-1"></div>
           <h1 className="font-semibold text-foreground flex items-center gap-2">
             <span className="text-muted-foreground font-normal">Editing:</span>
-            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-sm">{templateId}</span>
+            <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-sm">{currentTemplateId}</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -428,7 +432,7 @@ export default function EditorPage() {
 
           {/* Document Container */}
           <TemplateRenderer
-            templateId={templateId}
+            templateId={currentTemplateId}
             personal={personal}
             experience={experience}
             education={education}
