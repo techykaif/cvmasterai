@@ -16,12 +16,12 @@ The project currently features a polished frontend, functional authentication, a
 - **Dashboard**: View and delete created resumes.
 - **Template Gallery**: Browse and preview a selection of professional resume templates.
 - **Editor UI**: A fully responsive form-based editor with a real-time live preview.
-
-### In Development (Missing / Partial)
 - **Resume Persistence**: Saving edits made in the editor back to the database.
 - **Export Capabilities**: Generating and downloading high-fidelity PDFs and DOCX files.
-- **AI Intelligence**: AI-powered rewriting, summary generation, and ATS optimization.
-- **Security Hardening**: Server-side route protection and strict database security rules.
+
+### In Development (Missing / Partial)
+- **AI Intelligence**: AI-powered rewriting, summary generation, and ATS optimization (Coming Soon).
+- **Security Hardening (Advanced)**: Next.js middleware and API route protections.
 
 ## Tech Stack
 
@@ -112,10 +112,10 @@ Currently available scripts:
 
 ## Security
 
-The application currently relies on client-side Firebase logic.
+The application relies on client-side Firebase logic backed by strict backend rules.
 - **Authentication**: Securely managed by Firebase Auth.
 - **Route Protection**: Currently implemented via client-side redirects. Server-side middleware is planned for a future milestone.
-- **Database Access**: Currently relies on client-side queries. Proper Firestore Security Rules are required and planned for a future milestone to ensure secure data access.
+- **Database Access**: Protected by Firestore Security Rules. A user can only read, create, update, or delete resumes belonging to their own authenticated UID. Client-side checks are maintained for UX, but the backend rules enforce strict ownership.
 
 ## License
 
