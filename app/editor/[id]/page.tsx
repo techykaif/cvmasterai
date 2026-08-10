@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Save, Download, Plus, Trash2, GripVertical, FileText, Briefcase, GraduationCap, Code, X } from "lucide-react";
+import {
+  ArrowLeft, FileText, Briefcase, GraduationCap, Code,
+  Settings, Save, Download, Plus, Trash2, ArrowUp, ArrowDown, X
+} from "lucide-react";
 import Link from "next/link";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
@@ -43,42 +46,20 @@ export default function EditorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [personal, setPersonal] = useState({
-    name: "John Doe",
-    title: "Senior Software Engineer",
-    email: "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    website: "linkedin.com/in/johndoe",
-    address: "San Francisco, CA",
-    summary: "Experienced software engineer with over 8 years of experience in building scalable web applications and leading cross-functional teams. Passionate about modern web technologies and clean architecture.",
+    name: "",
+    title: "",
+    email: "",
+    phone: "",
+    website: "",
+    address: "",
+    summary: "",
   });
 
-  const [experience, setExperience] = useState<Experience[]>([
-    {
-      id: "1",
-      company: "TechNova Solutions",
-      title: "Senior Full Stack Engineer",
-      date: "Jan 2021 - Present",
-      description: "• Architected and developed a high-traffic microservices platform handling 1M+ daily requests.\n• Led a team of 5 engineers to deliver a new real-time analytics dashboard using React and WebSockets.\n• Reduced cloud infrastructure costs by 30% through Docker container optimization.",
-    },
-    {
-      id: "2",
-      company: "CreativeApp Inc.",
-      title: "Software Engineer",
-      date: "Jun 2017 - Dec 2020",
-      description: "• Developed interactive user interfaces using React and Redux, improving user retention by 25%.\n• Integrated RESTful APIs and optimized database queries in Node.js.\n• Mentored 3 junior developers and established code review guidelines.",
-    }
-  ]);
+  const [experience, setExperience] = useState<Experience[]>([]);
 
-  const [education, setEducation] = useState<Education[]>([
-    {
-      id: "1",
-      school: "University of California, Berkeley",
-      degree: "B.S. Computer Science",
-      date: "2013 - 2017",
-    }
-  ]);
+  const [education, setEducation] = useState<Education[]>([]);
 
-  const [skills, setSkills] = useState("JavaScript (ES6+), TypeScript, React, Next.js, Node.js, Python, PostgreSQL, MongoDB, Docker, AWS (EC2, S3, Lambda), Git, CI/CD");
+  const [skills, setSkills] = useState("");
 
   const addExperience = () => {
     setExperience([...experience, { id: Date.now().toString(), company: "", title: "", date: "", description: "" }]);
@@ -92,6 +73,17 @@ export default function EditorPage() {
     setExperience(experience.filter(exp => exp.id !== id));
   };
 
+  const moveExperience = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === experience.length - 1) return;
+    const newExp = [...experience];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = newExp[index];
+    newExp[index] = newExp[targetIndex];
+    newExp[targetIndex] = temp;
+    setExperience(newExp);
+  };
+
   const addEducation = () => {
     setEducation([...education, { id: Date.now().toString(), school: "", degree: "", date: "" }]);
   };
@@ -102,6 +94,17 @@ export default function EditorPage() {
 
   const removeEducation = (id: string) => {
     setEducation(education.filter(edu => edu.id !== id));
+  };
+
+  const moveEducation = (index: number, direction: 'up' | 'down') => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === education.length - 1) return;
+    const newEdu = [...education];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = newEdu[index];
+    newEdu[index] = newEdu[targetIndex];
+    newEdu[targetIndex] = temp;
+    setEducation(newEdu);
   };
 
   useEffect(() => {
@@ -398,8 +401,13 @@ export default function EditorPage() {
                   <div className="space-y-8">
                     {experience.map((exp, index) => (
                       <div key={exp.id} className="relative p-5 rounded-2xl border border-border bg-background/50 hover:border-primary/30 transition-all group">
-                        <div className="absolute -left-3 top-6 bg-card border border-border rounded p-1 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity">
-                          <GripVertical className="w-4 h-4 text-muted-foreground" />
+                        <div className="absolute -left-3 top-6 bg-card border border-border rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
+                          <button onClick={() => moveExperience(index, 'up')} disabled={index === 0} className="hover:bg-secondary p-0.5 rounded disabled:opacity-30">
+                            <ArrowUp className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                          <button onClick={() => moveExperience(index, 'down')} disabled={index === experience.length - 1} className="hover:bg-secondary p-0.5 rounded disabled:opacity-30">
+                            <ArrowDown className="w-4 h-4 text-muted-foreground" />
+                          </button>
                         </div>
                         <button onClick={() => removeExperience(exp.id)} className="absolute top-4 right-4 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                           <Trash2 className="w-4 h-4" />
@@ -452,6 +460,14 @@ export default function EditorPage() {
                   <div className="space-y-6">
                     {education.map((edu, index) => (
                       <div key={edu.id} className="relative p-5 rounded-2xl border border-border bg-background/50 hover:border-primary/30 transition-all group">
+                        <div className="absolute -left-3 top-6 bg-card border border-border rounded p-1 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-1">
+                          <button onClick={() => moveEducation(index, 'up')} disabled={index === 0} className="hover:bg-secondary p-0.5 rounded disabled:opacity-30">
+                            <ArrowUp className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                          <button onClick={() => moveEducation(index, 'down')} disabled={index === education.length - 1} className="hover:bg-secondary p-0.5 rounded disabled:opacity-30">
+                            <ArrowDown className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                        </div>
                         <button onClick={() => removeEducation(edu.id)} className="absolute top-4 right-4 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                           <Trash2 className="w-4 h-4" />
                         </button>

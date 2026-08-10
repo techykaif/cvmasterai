@@ -4,9 +4,56 @@ import { motion } from "framer-motion";
 import { FileText, Sparkles, Upload } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { auth, db } from "../firebaseConfig";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function CreatePage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuth(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleCreateScratch = async () => {
+    if (!isAuth || !auth?.currentUser) {
+      router.push("/signin?redirected=true");
+      return;
+    }
+    setLoading(true);
+    try {
+      const user = auth.currentUser;
+      const docRef = await addDoc(collection(db, "users", user.uid, "resumes"), {
+        templateId: "minimal-impact",
+        name: "Untitled Resume",
+        updatedAt: serverTimestamp(),
+        personal: {
+          name: "",
+          title: "",
+          email: "",
+          phone: "",
+          website: "",
+          address: "",
+          summary: ""
+        },
+        experience: [],
+        education: [],
+        skills: ""
+      });
+      router.push(`/editor/minimal-impact?resumeId=${docRef.id}`);
+    } catch (err) {
+      console.error("Error creating resume:", err);
+      alert("Failed to create resume.");
+      setLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -42,10 +89,11 @@ export default function CreatePage() {
               Build your resume step-by-step with our easy-to-use editor. Perfect if you are starting fresh.
             </p>
             <button
-              onClick={() => router.push("/custom")}
-              className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300"
+              onClick={handleCreateScratch}
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-full text-foreground font-medium bg-secondary hover:bg-secondary/80 border border-border transition-all duration-300 disabled:opacity-50"
             >
-              Create Custom
+              {loading ? "Creating..." : "Create Custom"}
             </button>
           </div>
 
