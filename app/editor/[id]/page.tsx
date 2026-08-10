@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Save, Download, Plus, Trash2, GripVertical, FileText, Briefcase, GraduationCap, Code } from "lucide-react";
+import { ArrowLeft, Save, Download, Plus, Trash2, GripVertical, FileText, Briefcase, GraduationCap, Code, X } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "@/app/firebaseConfig";
+import { onAuthStateChanged } from "firebase/auth";
 import { Button } from "@/app/components/Button";
 import TemplateRenderer from "./TemplateRenderer";
 
@@ -25,9 +28,16 @@ type Education = {
 
 export default function EditorPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
   const templateId = params.id as string;
-  
+  const resumeId = searchParams.get("resumeId");
+
   const [activeTab, setActiveTab] = useState("personal");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [personal, setPersonal] = useState({
     name: "John Doe",
@@ -91,6 +101,96 @@ export default function EditorPage() {
     setEducation(education.filter(edu => edu.id !== id));
   };
 
+  useEffect(() => {
+    if (!auth) {
+      router.push("/signin?redirected=true");
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/signin?redirected=true");
+        return;
+      }
+
+      if (!resumeId) {
+        setError("No resume ID provided.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const docRef = doc(db, "users", user.uid, "resumes", resumeId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.personal) setPersonal(data.personal);
+          if (data.experience) setExperience(data.experience);
+          if (data.education) setEducation(data.education);
+          if (data.skills) setSkills(data.skills);
+        } else {
+          setError("Resume not found or you do not have permission to view it.");
+        }
+      } catch (err) {
+        console.error("Error fetching resume:", err);
+        setError("Failed to load resume.");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [resumeId, router]);
+
+  const handleSave = async () => {
+    if (!auth?.currentUser || !resumeId) return;
+
+    setSaving(true);
+    try {
+      const docRef = doc(db, "users", auth.currentUser.uid, "resumes", resumeId);
+      await updateDoc(docRef, {
+        personal,
+        experience,
+        education,
+        skills,
+        updatedAt: serverTimestamp(),
+        name: personal.name ? `${personal.name}'s Resume` : "Untitled Resume"
+      });
+    } catch (err) {
+      console.error("Error saving resume:", err);
+      alert("Failed to save resume. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-muted-foreground font-medium animate-pulse">Loading editor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-6 text-center">
+        <div className="max-w-md bg-card border border-border rounded-2xl p-8 shadow-sm">
+          <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <X className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-foreground mb-2">Error</h2>
+          <p className="text-muted-foreground mb-6">{error}</p>
+          <Button href="/dashboard" text="Back to Dashboard" className="w-full justify-center" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans">
       {/* Header */}
@@ -101,14 +201,22 @@ export default function EditorPage() {
           </Link>
           <div className="h-6 w-px bg-border mx-1"></div>
           <h1 className="font-semibold text-foreground flex items-center gap-2">
-            <span className="text-muted-foreground font-normal">Editing:</span> 
+            <span className="text-muted-foreground font-normal">Editing:</span>
             <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-sm">{templateId}</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium transition-colors border border-border">
-            <Save className="w-4 h-4 text-muted-foreground" />
-            Save
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium transition-colors border border-border disabled:opacity-50"
+          >
+            {saving ? (
+              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 text-muted-foreground" />
+            )}
+            {saving ? "Saving..." : "Save"}
           </button>
           <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium shadow-md transition-all hover:-translate-y-0.5">
             <Download className="w-4 h-4" />
@@ -119,7 +227,7 @@ export default function EditorPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        
+
         {/* Editor Sidebar */}
         <div className="w-[450px] border-r border-border bg-card flex flex-col z-10 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
           {/* Tabs */}
@@ -144,7 +252,7 @@ export default function EditorPage() {
           {/* Form Content */}
           <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
             <AnimatePresence mode="wait">
-              
+
               {/* Personal Tab */}
               {activeTab === "personal" && (
                 <motion.div
@@ -208,7 +316,7 @@ export default function EditorPage() {
                       <Plus className="w-4 h-4" /> Add Role
                     </button>
                   </div>
-                  
+
                   <div className="space-y-8">
                     {experience.map((exp, index) => (
                       <div key={exp.id} className="relative p-5 rounded-2xl border border-border bg-background/50 hover:border-primary/30 transition-all group">
@@ -218,7 +326,7 @@ export default function EditorPage() {
                         <button onClick={() => removeExperience(exp.id)} className="absolute top-4 right-4 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                           <Trash2 className="w-4 h-4" />
                         </button>
-                        
+
                         <div className="grid grid-cols-2 gap-4 mb-4">
                           <div className="col-span-2">
                             <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Company</label>
@@ -269,7 +377,7 @@ export default function EditorPage() {
                         <button onClick={() => removeEducation(edu.id)} className="absolute top-4 right-4 text-muted-foreground hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
                           <Trash2 className="w-4 h-4" />
                         </button>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <div className="col-span-2">
                             <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Institution</label>
@@ -317,9 +425,9 @@ export default function EditorPage() {
 
         {/* Live Preview Area */}
         <div className="flex-1 bg-secondary/40 overflow-y-auto p-4 md:p-8 flex justify-center items-start custom-scrollbar">
-          
+
           {/* Document Container */}
-          <TemplateRenderer 
+          <TemplateRenderer
             templateId={templateId}
             personal={personal}
             experience={experience}
@@ -328,7 +436,7 @@ export default function EditorPage() {
           />
         </div>
       </div>
-      
+
       {/* Custom Styles for Scrollbar */}
       <style dangerouslySetInnerHTML={{__html: `
         .no-scrollbar::-webkit-scrollbar {

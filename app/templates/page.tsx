@@ -3,6 +3,9 @@
 import { useState, useMemo } from "react"
 import { motion } from "framer-motion"
 import { Download, Star, X } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { auth, db } from "@/app/firebaseConfig"
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"
 
 import { Button } from "../components/Button"
 import { Input } from "@/components/ui/input"
@@ -224,10 +227,46 @@ const templateData = [
 const categories = ["All Templates", "Professional", "Creative", "Academic", "Entry Level", "Executive", "Technical"]
 
 export default function TemplatesPage() {
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState("All Templates")
   const [searchQuery, setSearchQuery] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentImage, setCurrentImage] = useState("")
+  const [creatingId, setCreatingId] = useState<string | null>(null)
+
+  const handleUseTemplate = async (templateId: string) => {
+    if (!auth?.currentUser) {
+      router.push("/signin?redirected=true");
+      return;
+    }
+
+    try {
+      setCreatingId(templateId);
+      const user = auth.currentUser;
+      const docRef = await addDoc(collection(db, "users", user.uid, "resumes"), {
+        templateId,
+        name: "Untitled Resume",
+        updatedAt: serverTimestamp(),
+        personal: {
+          name: "",
+          title: "",
+          email: "",
+          phone: "",
+          website: "",
+          address: "",
+          summary: ""
+        },
+        experience: [],
+        education: [],
+        skills: ""
+      });
+      router.push(`/editor/${templateId}?resumeId=${docRef.id}`);
+    } catch (error) {
+      console.error("Error creating resume:", error);
+      alert("Failed to create resume. Please try again.");
+      setCreatingId(null);
+    }
+  };
 
   const filteredTemplates = useMemo(() => {
     return templateData.filter((template) => {
@@ -244,14 +283,14 @@ export default function TemplatesPage() {
     setIsModalOpen(true)
   }
 
-  
+
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Subtle Background Pattern */}
       <div className="absolute inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
       <div className="pt-16 pb-12 border-b border-border/40">
-        <motion.div 
+        <motion.div
           className="container mx-auto px-6 text-center"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -314,7 +353,7 @@ export default function TemplatesPage() {
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
               </div>
-              
+
               <div className="p-6 flex-1 flex flex-col">
                 <div className="mb-4">
                   <h3 className="text-lg font-bold text-foreground line-clamp-1">{template.name}</h3>
@@ -329,16 +368,18 @@ export default function TemplatesPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {template.description && (
                   <p className="text-muted-foreground text-sm mb-6 line-clamp-2">{template.description}</p>
                 )}
-                
+
                 <div className="mt-auto grid grid-cols-2 gap-3">
-                  <Button 
-                    href={`/editor/${template.id}`} 
-                    text="Use Template" 
-                    className="w-full text-sm font-medium h-10 flex items-center justify-center rounded-full" 
+                  <Button
+                    type="button"
+                    onClick={() => handleUseTemplate(template.id)}
+                    text={creatingId === template.id ? "Creating..." : "Use Template"}
+                    disabled={creatingId === template.id}
+                    className="w-full text-sm font-medium h-10 flex items-center justify-center rounded-full"
                   />
                   <Button
                     type="button"
