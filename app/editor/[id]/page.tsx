@@ -38,6 +38,8 @@ export default function EditorPage() {
   const [activeTab, setActiveTab] = useState("personal");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [exportingPDF, setExportingPDF] = useState(false);
+  const [exportingDOCX, setExportingDOCX] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [personal, setPersonal] = useState({
@@ -169,6 +171,58 @@ export default function EditorPage() {
     }
   };
 
+  const handleExportPDF = async () => {
+    const element = document.getElementById("resume-preview");
+    if (!element) return;
+
+    setExportingPDF(true);
+    try {
+      const html2pdf = (await import("html2pdf.js")).default;
+      await html2pdf()
+        .from(element)
+        .set({
+          margin: 0,
+          filename: personal.name ? `${personal.name.replace(/\s+/g, "_")}_Resume.pdf` : "Resume.pdf",
+          image: { type: "jpeg", quality: 1 },
+          html2canvas: { scale: 3, useCORS: true },
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        })
+        .save();
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+      alert("Failed to export PDF.");
+    } finally {
+      setExportingPDF(false);
+    }
+  };
+
+  const handleExportDOCX = async () => {
+    setExportingDOCX(true);
+    try {
+      const { generateDOCX } = await import("./exportDOCX");
+      const blob = await generateDOCX(currentTemplateId, {
+        personal,
+        experience,
+        education,
+        skills,
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      document.body.appendChild(a);
+      a.style.display = "none";
+      a.href = url;
+      a.download = personal.name ? `${personal.name.replace(/\s+/g, "_")}_Resume.docx` : "Resume.docx";
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("DOCX generation failed:", err);
+      alert("Failed to export DOCX.");
+    } finally {
+      setExportingDOCX(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -222,9 +276,29 @@ export default function EditorPage() {
             )}
             {saving ? "Saving..." : "Save"}
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium shadow-md transition-all hover:-translate-y-0.5">
-            <Download className="w-4 h-4" />
-            Download PDF
+          <button
+            onClick={handleExportDOCX}
+            disabled={exportingDOCX || exportingPDF}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary hover:bg-secondary/80 text-foreground text-sm font-medium transition-colors border border-border disabled:opacity-50"
+          >
+            {exportingDOCX ? (
+              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            {exportingDOCX ? "Exporting..." : "DOCX"}
+          </button>
+          <button
+            onClick={handleExportPDF}
+            disabled={exportingPDF || exportingDOCX}
+            className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-medium shadow-md transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:-translate-y-0"
+          >
+            {exportingPDF ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <Download className="w-4 h-4" />
+            )}
+            {exportingPDF ? "Exporting..." : "PDF"}
           </button>
         </div>
       </header>
@@ -431,13 +505,15 @@ export default function EditorPage() {
         <div className="flex-1 bg-secondary/40 overflow-y-auto p-4 md:p-8 flex justify-center items-start custom-scrollbar">
 
           {/* Document Container */}
-          <TemplateRenderer
-            templateId={currentTemplateId}
-            personal={personal}
-            experience={experience}
-            education={education}
-            skills={skills}
-          />
+          <div id="resume-preview">
+            <TemplateRenderer
+              templateId={currentTemplateId}
+              personal={personal}
+              experience={experience}
+              education={education}
+              skills={skills}
+            />
+          </div>
         </div>
       </div>
 
