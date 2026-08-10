@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { getAuth, onAuthStateChanged, User } from "firebase/auth"
 import { collection, query, getDocs, orderBy, deleteDoc, doc } from "firebase/firestore"
-import { app, db } from "@/app/firebaseConfig"
+import { auth, db } from "@/app/firebaseConfig"
 import { MotionButton } from "../components/ui/MotionButton"
 
 // Define resume type based on what we'd save in Firestore
@@ -26,7 +26,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const auth = getAuth(app);
+    if (!auth) {
+      router.push("/signin");
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);

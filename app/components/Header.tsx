@@ -5,8 +5,8 @@ import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, ChevronDown } from "lucide-react"
-import { getAuth, signOut, onAuthStateChanged } from "firebase/auth"
-import { app } from "@/app/firebaseConfig"
+import { signOut, onAuthStateChanged } from "firebase/auth"
+import { auth } from "@/app/firebaseConfig"
 import { Button } from "@/app/components/Button"
 import { MotionButton } from "@/app/components/ui/MotionButton"
 
@@ -20,9 +20,12 @@ export default function Header() {
   const router = useRouter()
   const pathname = usePathname() // Track the current route
 
-  const auth = getAuth(app)
-
   useEffect(() => {
+    if (!auth) {
+      setIsAuthChecked(true)
+      setIsLoading(false)
+      return
+    }
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ? { email: user.email } : null)
       setIsAuthChecked(true)

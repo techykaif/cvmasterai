@@ -15,6 +15,10 @@ export default function DashboardLayout({
   const router = useRouter()
 
   useEffect(() => {
+    if (!auth) {
+      router.push("/signin")
+      return
+    }
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setIsAuthenticated(true)

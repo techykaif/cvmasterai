@@ -1,7 +1,7 @@
 // firebaseConfig.ts
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { Auth, getAuth, GoogleAuthProvider } from "firebase/auth";
+import { Firestore, getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,7 +12,14 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+// Initialize Firebase only if the config has an apiKey (i.e. env vars are present).
+// This prevents Next.js static prerendering from crashing when secrets are unavailable.
+export const app = getApps().length === 0 && firebaseConfig.apiKey
+  ? initializeApp(firebaseConfig)
+  : getApps().length > 0
+    ? getApp()
+    : undefined as any;
+
+export const auth = (app ? getAuth(app) : undefined) as unknown as Auth;
+export const db = (app ? getFirestore(app) : undefined) as unknown as Firestore;
+export const googleProvider = (app ? new GoogleAuthProvider() : undefined) as unknown as GoogleAuthProvider;

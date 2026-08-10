@@ -19,6 +19,11 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    if (!auth) {
+      alert("Firebase is not configured. Please set environment variables.");
+      setLoading(false);
+      return;
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       if (userCredential.user) {
@@ -34,6 +39,10 @@ export default function SignUpPage() {
   };
 
   const handleGoogleSignIn = async () => {
+    if (!auth) {
+      alert("Firebase is not configured. Please set environment variables.");
+      return;
+    }
     try {
       await signInWithPopup(auth, googleProvider);
       router.push("/dashboard");
